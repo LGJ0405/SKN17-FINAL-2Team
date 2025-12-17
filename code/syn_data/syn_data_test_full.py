@@ -230,15 +230,15 @@ def validate_sample(sample: Dict[str, Any]) -> Dict[str, Any]:
     score = 1.0
 
     if unknown_who:
-        score -= 0.2
+        score -= 0.3
 
     if when_errors:
-        score -= 0.2
+        score -= 0.3
 
     if semantic_low:
         total_tasks = max(len(tasks), 1)
         ratio = len(semantic_low) / total_tasks
-        score -= 0.2 * ratio
+        score -= 0.3 * ratio
 
     score = max(score, 0.0)
 
