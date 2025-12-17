@@ -1,0 +1,311 @@
+/* LINE Seed KR 폰트 임포트 */
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+@import url('https://fastly.jsdelivr.net/gh/projectnoonnu/2410-1@1.0/LINESeedKR-Rg.woff2');
+
+@font-face {
+  font-family: 'LINESeedKR';
+  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/2410-1@1.0/LINESeedKR-Rg.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'LINESeedKR';
+  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/2410-1@1.0/LINESeedKR-Bd.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+}
+
+/* 페이지 전체 레이아웃 */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'LINESeedKR', -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  background: linear-gradient(135deg, #dbeafe 0%, #bae6fd 100%);
+  color: #2B2B2B;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.page-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 16px;
+}
+
+/* 로고 영역 */
+.logo-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.logo-image {
+  width: 200px;
+  height: auto;
+  filter: drop-shadow(0 2px 8px rgba(59, 130, 246, 0.15));
+}
+
+.logo-text {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+/* 카드(폼 박스) */
+.card {
+  width: 100%;
+  max-width: 440px;
+  background-color: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 28px 48px;
+  box-shadow: 0 10px 40px rgba(59, 130, 246, 0.12), 0 2px 8px rgba(59, 130, 246, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+/* 폼 요소 */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-label {
+  width: 100%;
+  margin: 0 0 8px 0;
+  display: block;
+  font-weight: 600;
+  font-size: 14px;
+  color: #334155;
+  letter-spacing: -0.01em;
+}
+
+.form-input {
+  width: 100%;
+  height: 48px;
+  padding: 12px 16px;
+  font-size: 15px;
+  border-radius: 12px;
+  border: 1.5px solid #e2e8f0;
+  background-color: #ffffff;
+  box-sizing: border-box;
+  transition: all 0.25s ease;
+  font-family: inherit;
+}
+
+.form-input::placeholder {
+  color: #94a3b8;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.08), 0 1px 2px rgba(0, 0, 0, 0.05);
+  transform: translateY(-1px);
+}
+
+/* 로그인 버튼 */
+.btn-primary {
+  width: 100%;
+  display: block;
+  margin: 8px 0 0;
+  height: 48px;
+  padding: 0;
+  font-size: 16px;
+  font-weight: 600;
+  background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.25);
+  letter-spacing: -0.01em;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.35);
+  transform: translateY(-2px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+/* 하단 링크 */
+.links {
+  margin-top: 4px;
+  text-align: center;
+}
+
+.forgot-link {
+  font-size: 14px;
+  color: #3b82f6;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  display: inline-block;
+}
+
+.forgot-link:hover {
+  color: #2563eb;
+  text-decoration: underline;
+  transform: translateY(-1px);
+}
+
+/* 에러 메시지 */
+.message-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 12px;
+}
+
+.message {
+  font-size: 14px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background-color: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+  font-weight: 500;
+}
+
+.message.success {
+  background-color: #ecfdf5;
+  color: #059669;
+  border: 1px solid #a7f3d0;
+}
+
+/* 모달 */
+
+/* 모달 오버레이 (회색 배경) */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* 처음에는 안 보이도록 */
+.hidden {
+  display: none;
+}
+
+/* 모달 박스 */
+.modal-box {
+  background-color: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 32px 40px;
+  min-width: 380px;
+  max-width: 90%;
+  text-align: center;
+  box-shadow: 0 20px 50px rgba(59, 130, 246, 0.2), 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+/* 모달 텍스트 */
+.modal-message {
+  margin: 0 0 28px;
+  font-size: 18px;
+  line-height: 1.6;
+  color: #1e293b;
+  font-weight: 500;
+}
+
+/* 버튼 영역 */
+.modal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+/* 공통 버튼 스타일 */
+.btn-modal {
+  min-width: 110px;
+  padding: 12px 24px;
+  border-radius: 12px;
+  border: none;
+  font-size: 15px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.25s ease;
+  letter-spacing: -0.01em;
+}
+
+/* 취소 버튼 */
+.btn-cancel {
+  background-color: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+}
+
+/* 확인 버튼 */
+.btn-confirm {
+  background: linear-gradient(135deg, #3b82f6, #60a5fa);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.25);
+}
+
+.btn-cancel:hover {
+  background-color: #e2e8f0;
+  transform: translateY(-1px);
+}
+
+.btn-confirm:hover {
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.35);
+  transform: translateY(-2px);
+}
+
+.btn-cancel:active,
+.btn-confirm:active {
+  transform: translateY(0);
+}
+
+/* 반응형 디자인 */
+@media (max-width: 520px) {
+  .card {
+    padding: 32px 28px;
+    max-width: 100%;
+  }
+
+  .logo-image {
+    width: 160px;
+  }
+
+  .form-input,
+  .btn-primary {
+    height: 44px;
+  }
+
+  .modal-box {
+    min-width: 320px;
+    padding: 24px 28px;
+  }
+
+  .btn-modal {
+    min-width: 90px;
+    padding: 10px 20px;
+  }
+}
+

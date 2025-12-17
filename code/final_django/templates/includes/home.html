@@ -1,0 +1,258 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}홈{% endblock %}
+{% block page_title %}홈{% endblock %}
+
+{% block extra_head %}
+  <link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+  <!-- 왼쪽 메인 영역 -->
+  <section class="dashboard-main">
+    <header class="dashboard-header">
+      <div class="dashboard-header-left">
+        <div class="calendar-icon-wrapper">
+          <span
+            class="dashboard-calendar-icon"
+            id="home-calendar-icon"
+            title="다른 달을 선택합니다."
+            aria-hidden="true"
+          ></span>
+
+          <!-- 달 선택 팝오버 (커스텀) -->
+          <div class="month-popover hidden" id="home-month-popover">
+            <div class="month-popover-header">
+              <button type="button" class="month-year-btn" id="month-prev-year">‹</button>
+              <span id="month-popover-year"></span>
+              <button type="button" class="month-year-btn" id="month-next-year">›</button>
+            </div>
+            <div class="month-popover-grid">
+              <button type="button" class="month-btn" data-month="0">1월</button>
+              <button type="button" class="month-btn" data-month="1">2월</button>
+              <button type="button" class="month-btn" data-month="2">3월</button>
+              <button type="button" class="month-btn" data-month="3">4월</button>
+              <button type="button" class="month-btn" data-month="4">5월</button>
+              <button type="button" class="month-btn" data-month="5">6월</button>
+              <button type="button" class="month-btn" data-month="6">7월</button>
+              <button type="button" class="month-btn" data-month="7">8월</button>
+              <button type="button" class="month-btn" data-month="8">9월</button>
+              <button type="button" class="month-btn" data-month="9">10월</button>
+              <button type="button" class="month-btn" data-month="10">11월</button>
+              <button type="button" class="month-btn" data-month="11">12월</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="date-text-wrapper">
+          <span id="home-current-date" title="오늘 달력으로 이동합니다."></span>
+        </div>
+      </div>
+
+
+      <div class="dashboard-header-right">
+        <div class="calendar-filter-wrapper">
+          <select id="home-calendar-filter" class="calendar-filter-select">
+            <option value="all">전체 캘린더</option>
+          </select>
+        </div>
+        <button type="button" class="btn-add-schedule">
+          <img src="{% static 'img/icon-plus.svg' %}" alt="추가" class="btn-add-icon">
+          <span class="btn-add-text">일정 추가</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="calendar-card">
+      <div class="calendar-wrapper">
+        <!-- FullCalendar -->
+        <div id="home-calendar"></div>
+      </div>
+      <div
+        class="calendar-auth-links"
+        data-google-authed="{{ request.session.google_credentials|yesno:'true,false' }}"
+      >
+        <a href="javascript:void(0)" id="link-google-login" class="calendar-auth-link">
+          Google 로그인
+        </a>
+        <a href="javascript:void(0)" id="link-google-logout" class="calendar-auth-link">
+          Google 로그아웃
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 오른쪽 일정 영역 -->
+  <aside class="dashboard-side">
+    <section class="schedule-card">
+      <h2 class="schedule-card-title">오늘의 일정</h2>
+      <!-- 일정이 없을 때 메시지 -->
+      <div id="today-schedule-empty" class="schedule-empty">
+        오늘 일정이 없습니다.
+      </div>
+      <!-- 오늘 일정 목록 -->
+      <ul id="today-schedule-list" class="schedule-list"></ul>
+    </section>
+
+    <section class="schedule-card">
+      <h2 class="schedule-card-title">이번 달 일정</h2>
+      <!-- 일정이 없을 때 메시지 -->
+      <div id="month-schedule-empty" class="schedule-empty">
+        이번 달 일정이 없습니다.
+      </div>
+      <!-- 이번 달 일정 목록 -->
+      <ul id="month-schedule-list" class="schedule-list"></ul>
+    </section>
+  </aside>
+
+  <!-- 일정 추가/수정 모달 -->
+  <div id="schedule-modal" class="schedule-modal hidden">
+    <div class="schedule-modal-backdrop"></div>
+
+    <div class="schedule-modal-dialog">
+      <h2 class="schedule-modal-title" id="schedule-modal-title">일정 추가</h2>
+      <input type="hidden" id="schedule-mode" value="create">
+      <input type="hidden" id="schedule-event-id" value="">
+
+      <div class="schedule-field">
+        <label for="schedule-calendar">캘린더</label>
+        <div class="schedule-calendar-wrapper">
+          <select id="schedule-calendar" class="schedule-input schedule-calendar-select">
+            <option value="primary">기본 캘린더</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="schedule-field">
+        <label for="schedule-title">제목</label>
+        <input
+          type="text"
+          id="schedule-title"
+          class="schedule-input"
+          placeholder=""
+        />
+      </div>
+
+      <div class="schedule-field">
+        <label>시작 일시</label>
+        <div class="schedule-datetime-row">
+          <input
+            type="date"
+            id="schedule-start-date"
+            class="schedule-input"
+          />
+          <input
+            type="time"
+            id="schedule-start-time"
+            class="schedule-input"
+          />
+        </div>
+      </div>
+
+      <div class="schedule-field">
+        <label>종료 일시</label>
+        <div class="schedule-datetime-row">
+          <input
+            type="date"
+            id="schedule-end-date"
+            class="schedule-input"
+          />
+          <input
+            type="time"
+            id="schedule-end-time"
+            class="schedule-input"
+          />
+        </div>
+      </div>
+
+      <div class="schedule-field schedule-all-day-row">
+        <label class="schedule-checkbox-label">
+          <input type="checkbox" id="schedule-all-day" />
+          <span class="schedule-checkbox-text">종일</span>
+        </label>
+      </div>
+
+      <div class="schedule-field">
+        <label for="schedule-repeat">반복</label>
+        <select id="schedule-repeat" class="schedule-input">
+          <option value="none">안함</option>
+          <option value="daily">매일</option>
+          <option value="weekly">매주</option>
+          <option value="monthly">매월</option>
+          <option value="yearly">매년</option>
+        </select>
+      </div>
+
+      <div class="schedule-field">
+        <label for="schedule-description">설명</label>
+        <textarea
+          id="schedule-description"
+          class="schedule-textarea"
+          rows="4"
+          placeholder="일정에 대한 설명을 입력하세요."
+        ></textarea>
+      </div>
+
+      <div class="schedule-actions">
+        <button id="schedule-submit" class="schedule-btn schedule-btn-primary">
+          추가
+        </button>
+        <button
+          id="schedule-cancel"
+          class="schedule-btn schedule-btn-secondary"
+          type="button"
+        >
+          취소
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 일정 상세 모달 -->
+  <div id="event-detail-modal" class="event-modal hidden">
+    <!-- 어두운 배경 -->
+    <div class="event-modal-backdrop"></div>
+
+    <!-- 카드 영역 -->
+    <div class="event-modal-dialog">
+      <!-- 상단 날짜 영역 -->
+      <div class="event-modal-header">
+        <div class="event-modal-date-wrap">
+          <span class="event-modal-icon"></span>
+          <span id="event-detail-date" class="event-modal-date"></span>
+        </div>
+      </div>
+
+      <!-- 본문 -->
+      <div class="event-modal-body">
+        <div class="event-modal-title-wrap">
+          <span class="event-modal-dot"></span>
+          <p class="event-modal-title" id="event-detail-title"></p>
+        </div>
+        <!-- 설명을 쓰지 않으면 비워두면 됩니다 -->
+        <p id="event-detail-description" class="event-modal-desc"></p>
+      </div>
+
+      <!-- 하단 버튼들 -->
+      <div class="event-modal-actions">
+        <button id="event-detail-edit" class="event-modal-edit-btn" type="button">
+          <span>수정</span>
+        </button>
+        <button id="event-detail-delete" class="event-modal-delete-btn" type="button">
+          <span>삭제</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_script %}
+  <!-- FullCalendar JS -->
+  <script src="{% static 'js/calendars/fullcalendar_6.1.19.js' %}"></script>
+
+  <!-- 홈 화면용 캘린더 초기화 스크립트 -->
+  <script src="{% static 'js/calendars/home_calendar.js' %}"></script>
+{% endblock %}

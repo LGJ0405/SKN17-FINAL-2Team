@@ -1,0 +1,904 @@
+/* 페이지 전체 컨테이너 */
+.meeting-detail-page {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e0f2fe;
+  padding: 24px 32px;
+  box-sizing: border-box;
+  height: 100%;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.06);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* 상단 제목 + 라인 */
+.detail-header-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 24px;
+  margin-bottom: 16px;
+  flex-shrink: 0;
+}
+
+.detail-page-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #1e40af;
+}
+
+.detail-page-title-line {
+  flex: 1 1 auto;
+  height: 1px;
+  background-color: #e0f2fe;
+}
+
+/* 회의 제목 행 */
+.detail-meeting-title-row {
+  margin-bottom: 18px;
+  flex-shrink: 0;
+}
+
+.detail-meeting-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+/* 좌우 2컬럼 */
+.detail-layout {
+  display: grid;
+  grid-template-columns: 1.1fr 1.1fr;
+  column-gap: 40px;
+  align-items: flex-start;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* 공통 라벨 */
+.section-label {
+  font-size: 14px;
+  color: #475569;
+  margin-bottom: 8px;
+  flex-shrink: 0;
+}
+
+/* ========== 왼쪽 : 전문 ========== */
+
+.detail-left {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.detail-transcript-box {
+  position: relative;
+  display: flex;
+  background-color: #fafeff;
+  border-radius: 10px;
+  border: 1px solid #e0f2fe;
+  padding: 10px 12px;
+  box-sizing: border-box;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.detail-transcript-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #1e293b;
+}
+
+/* 하단 텍스트 버튼들 */
+.detail-transcript-actions {
+  display: flex;
+  gap: 24px;
+  margin-top: 12px;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.text-link-button {
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  color: #475569;
+}
+
+.text-link-button:hover:not(.text-link-disabled) {
+  text-decoration: underline;
+}
+
+.text-link-disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* ========== 오른쪽 : 탭 & 콘텐츠 ========== */
+
+.detail-right {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  padding-right: 32px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* 탭 헤더 */
+.detail-tabs {
+  display: inline-flex;
+  border-bottom: 1px solid #e0f2fe;
+  margin-bottom: 12px;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.detail-tab {
+  position: relative;
+  border: none;
+  background-color: transparent;
+  padding: 6px 16px;
+  font-size: 14px;
+  color: #64748b;
+  cursor: pointer;
+}
+
+.detail-tab-active {
+  color: #1e293b;
+  font-weight: 600;
+}
+
+.detail-tab-active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background-color: #3b82f6;
+}
+
+/* 탭 패널 컨테이너 */
+.detail-tab-panels {
+  margin-top: 4px;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 개별 탭 패널 */
+.detail-tab-panel {
+  display: none;
+}
+
+.detail-tab-panel-active {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* 요약 박스 */
+.detail-summary-box {
+  background-color: #ffffff;
+  border-radius: 10px;
+  border: 1px solid #e0f2fe;
+  padding: 14px 16px;
+  box-sizing: border-box;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #334155;
+}
+
+.summary-agenda-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.summary-agenda-item {
+  padding: 12px 14px;
+  border: 1px solid #e0f2fe;
+  border-radius: 10px;
+  background: #fafeff;
+}
+
+.summary-agenda-title {
+  font-weight: 700;
+  font-size: 1.08rem;
+  color: #1f2937;
+  margin-bottom: 6px;
+}
+
+.summary-agenda-desc {
+  font-weight: 500;
+  color: #4b5563;
+  margin-bottom: 4px;
+}
+
+.summary-agenda-summary {
+  color: #374151;
+}
+
+/* 태스크 박스 */
+.detail-task-box {
+  background-color: #ffffff;
+  border-radius: 10px;
+  border: 1px solid #e0f2fe;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+  overflow: hidden;
+}
+
+.detail-task-header,
+.detail-task-row {
+  display: grid;
+  grid-template-columns: 0.4fr 1.5fr 2.5fr 1.5fr 1fr;
+  column-gap: 12px;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.detail-task-col-check {
+  text-align: center;
+}
+
+.detail-task-header {
+  border-bottom: 2px solid #e0f2fe;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  font-weight: 700;
+  font-size: 13px;
+  color: #1e40af;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border-radius: 8px;
+  gap: 8px;
+}
+
+.detail-task-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+
+.detail-task-row {
+  padding: 10px 8px;
+  border-bottom: 1px solid #f0f9ff;
+  color: #475569;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.detail-task-row:hover {
+  background: linear-gradient(135deg, #f8fafc 0%, #f0f9ff 100%);
+}
+
+.detail-task-col {
+  word-break: break-word;
+}
+
+.detail-task-header .detail-task-col {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.detail-task-header .detail-task-col-who,
+.detail-task-header .detail-task-col-what,
+.detail-task-header .detail-task-col-when,
+.detail-task-header .detail-task-col-add {
+  justify-content: center;
+}
+
+.task-edit-field {
+  width: 100%;
+  border: 1px solid #e0f2fe;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+  box-sizing: border-box;
+  resize: vertical;
+  background: linear-gradient(135deg, #ffffff 0%, #fafeff 100%);
+  color: #334155;
+  transition: all 0.2s ease;
+}
+
+.task-edit-field:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  background: #ffffff;
+}
+
+.task-who-input::-webkit-calendar-picker-indicator {
+  display: none !important;
+}
+.task-who-input {
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
+}
+.task-who-wrapper {
+  position: relative;
+  display: block;
+}
+.task-who-input {
+  padding-right: 28px;
+  min-width: 120px;
+  background: linear-gradient(135deg, #ffffff 0%, #fafeff 100%);
+  border: 1px solid #e0f2fe;
+  border-radius: 8px;
+  padding-left: 10px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+  color: #334155;
+  transition: all 0.2s ease;
+}
+
+.task-who-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  background: #ffffff;
+}
+
+.task-calendar-popover {
+  position: absolute;
+  z-index: 2000;
+  background: linear-gradient(135deg, #ffffff 0%, #fafeff 100%);
+  border: 1px solid #e0f2fe;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.15);
+  width: 240px;
+  padding: 14px 16px;
+  box-sizing: border-box;
+  display: none;
+}
+.task-calendar-header {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1e40af;
+  margin-bottom: 10px;
+}
+.task-calendar-body {
+  margin-bottom: 10px;
+}
+.task-calendar-label {
+  display: block;
+  font-size: 12px;
+  color: #475569;
+  margin-bottom: 6px;
+}
+.task-calendar-date {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 13px;
+  border: 1px solid #e0f2fe;
+  border-radius: 8px;
+  box-sizing: border-box;
+  background: #ffffff;
+  color: #334155;
+  transition: all 0.2s ease;
+}
+
+.task-calendar-date:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+.task-calendar-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.task-calendar-btn {
+  border: none;
+  background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #ffffff;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.2);
+  transition: all 0.2s ease;
+}
+.task-calendar-btn:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+  box-shadow: 0 3px 10px rgba(59, 130, 246, 0.3);
+  transform: translateY(-1px);
+}
+.task-calendar-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(59, 130, 246, 0.2);
+}
+.task-who-toggle {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 4px 6px;
+  color: #3b82f6;
+  z-index: 5;
+  pointer-events: auto;
+  transition: all 0.2s ease;
+}
+.task-who-toggle:hover {
+  color: #2563eb;
+  transform: translateY(-50%) scale(1.1);
+}
+.task-who-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  width: 100%;
+  max-height: 200px;
+  overflow-y: auto;
+  background: linear-gradient(135deg, #ffffff 0%, #fafeff 100%);
+  border: 1px solid #e0f2fe;
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.15);
+  z-index: 50;
+}
+.task-who-dropdown-item,
+.task-who-dropdown-empty {
+  padding: 10px 14px;
+  font-size: 13px;
+  cursor: pointer;
+  color: #334155;
+  transition: all 0.2s ease;
+}
+.task-who-dropdown-item:hover {
+  background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%);
+  color: #1e40af;
+}
+.task-who-dropdown-empty {
+  color: #94a3b8;
+  cursor: default;
+}
+.task-who-dropdown-empty:hover {
+  background: transparent;
+  color: #94a3b8;
+}
+
+.detail-task-add-btn {
+  min-width: 60px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+  transition: all 0.2s ease;
+}
+
+.detail-task-add-btn:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  transform: translateY(-1px);
+}
+
+.detail-task-add-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(59, 130, 246, 0.2);
+}
+
+/* 회의록 박스 */
+.detail-minutes-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.detail-minutes-box {
+  background-color: #ffffff;
+  border-radius: 10px;
+  border: 1px solid #e0f2fe;
+  padding: 16px;
+  box-sizing: border-box;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* 회의록 기본 테이블 */
+.minutes-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 16px;
+  font-size: 13px;
+}
+
+.minutes-table th,
+.minutes-table td {
+  border: 1px solid #e0f2fe;
+  padding: 6px 8px;
+  text-align: left;
+  color: #475569;
+}
+
+.minutes-table th {
+  background-color: #f0f9ff;
+  width: 20%;
+  color: #1e40af;
+  font-weight: 600;
+}
+
+/* 회의록 섹션 */
+.minutes-section-title {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.minutes-section-box {
+  border: 1px solid #e0f2fe;
+  border-radius: 4px;
+  height: 80px;
+  margin-bottom: 12px;
+}
+
+/* 회의록 버튼 */
+.detail-minutes-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.detail-minutes-btn {
+  min-width: 110px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background-color: #f0f9ff;
+  font-size: 13px;
+  color: #475569;
+  cursor: pointer;
+}
+
+.detail-minutes-btn:hover {
+  background-color: #e0f2fe;
+}
+
+/* 공통 빈 상태 텍스트 */
+.detail-empty-text {
+  font-size: 13px;
+  color: #94a3b8;
+  padding: 4px 2px;
+}
+
+/* ========== 회의 정보 토글 & 팝업 ========== */
+
+/* 제목 + 화살표 버튼 컨테이너 */
+.detail-meeting-title-container {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 회의 제목 텍스트는 이미 정의되어 있음 (detail-meeting-title) */
+
+/* 화살표 버튼 */
+.meeting-info-toggle {
+  border: none;
+  background: none;
+  padding: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.meeting-info-arrow {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid #475569;
+  border-bottom: 2px solid #475569;
+  transform: rotate(45deg); /* 기본: 아래쪽 화살표 */
+  transition: transform 0.18s ease-out;
+}
+
+/* 열려 있을 때 회전(위쪽 화살표) */
+.meeting-info-toggle[aria-expanded="true"] .meeting-info-arrow {
+  transform: rotate(-135deg);
+}
+
+/* 전체 화면 오버레이 */
+.meeting-info-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: none;                /* 기본은 숨김 */
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+/* JS에서 is-open 클래스로 표시 */
+.meeting-info-overlay.is-open {
+  display: flex;
+}
+
+/* 팝업 카드 */
+.meeting-info-modal {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 20px 24px 20px;
+  box-sizing: border-box;
+  width: 360px;
+  max-width: calc(100% - 40px);
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.45);
+}
+
+/* 팝업 헤더 */
+.meeting-info-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-bottom: -12px;
+}
+
+.meeting-info-close {
+  border: none;
+  background: none;
+  padding: 2px 4px;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  color: #64748b;
+}
+
+/* 팝업 본문 */
+.meeting-info-body {
+  font-size: 14px;
+  color: #475569;
+}
+
+.meeting-info-line {
+  margin: 0 0 8px;
+}
+
+.meeting-info-line-attendees-label {
+  margin-top: 10px;
+}
+
+.meeting-info-label {
+  font-weight: 600;
+  margin-right: 4px;
+}
+
+.meeting-info-value {
+  word-break: break-word;
+}
+
+/* 참석자 리스트 */
+.meeting-info-attendee-list {
+  margin: 0;
+  padding-left: 18px;
+  list-style-type: disc;
+}
+
+.meeting-info-attendee-list li {
+  margin-bottom: 4px;
+}
+
+/* ========== 회의록 편집 레이아웃 ========== */
+
+/* 회의록 전체 편집 영역 루트 */
+#minutes-editor.minutes-editor {
+  margin-top: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* 각 섹션(wrapper) */
+.minutes-section {
+  margin-top: 16px;
+}
+
+/* 첫 번째 섹션은 위 여백 제거 */
+.minutes-section:first-child {
+  margin-top: 0;
+}
+
+/* 템플릿 안에서 내용 입력하는 박스 */
+.minutes-editbox {
+  min-height: 80px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  box-sizing: border-box;
+}
+
+/* contenteditable 포커스 시 스타일 */
+.minutes-editbox[contenteditable="true"]:focus {
+  outline: none;
+  border-color: #3b82f6;
+  background: #ffffff;
+}
+
+/* 혹시 다른 contenteditable 이 들어와도 공통 적용 */
+#minutes-editor [contenteditable="true"] {
+  outline: none;
+}
+
+/* ========== 회의록 구성 선택 팝업 ========== */
+
+.minutes-config-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.45);
+
+  display: none; /* 기본 숨김 */
+
+  /* 절대 중앙 정렬 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 1000;
+}
+/* JS에서 is-open 클래스 토글 */
+.minutes-config-overlay.is-open {
+  display: flex;
+}
+
+.minutes-config-modal {
+  width: 280px;
+  max-width: calc(100% - 40px);
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 20px 22px 18px;
+  box-sizing: border-box;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.4);
+  margin: 0;
+}
+
+/* 헤더: 제목 + 닫기 버튼 */
+.minutes-config-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.minutes-config-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.minutes-config-close {
+  border: none;
+  background: none;
+  padding: 2px 4px;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  color: #64748b;
+}
+
+/* 본문 (체크박스 리스트) */
+.minutes-config-body {
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+.minutes-config-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.minutes-config-item:last-child {
+  margin-bottom: 0;
+}
+
+.minutes-config-item input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+}
+
+/* 하단 버튼 영역 */
+.minutes-config-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.minutes-config-btn {
+  min-width: 64px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.minutes-config-btn:hover {
+  background: #f3f4f6;
+}
+
+/* ========== 커스텀 스크롤바 ========== */
+.detail-transcript-scroll::-webkit-scrollbar,
+.detail-summary-box::-webkit-scrollbar,
+.detail-task-body::-webkit-scrollbar,
+.detail-minutes-box::-webkit-scrollbar,
+.task-who-dropdown::-webkit-scrollbar {
+  width: 6px;
+}
+
+.detail-transcript-scroll::-webkit-scrollbar-track,
+.detail-summary-box::-webkit-scrollbar-track,
+.detail-task-body::-webkit-scrollbar-track,
+.detail-minutes-box::-webkit-scrollbar-track,
+.task-who-dropdown::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 10px;
+}
+
+.detail-transcript-scroll::-webkit-scrollbar-thumb,
+.detail-summary-box::-webkit-scrollbar-thumb,
+.detail-task-body::-webkit-scrollbar-thumb,
+.detail-minutes-box::-webkit-scrollbar-thumb,
+.task-who-dropdown::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+  border-radius: 10px;
+}
+
+.detail-transcript-scroll::-webkit-scrollbar-thumb:hover,
+.detail-summary-box::-webkit-scrollbar-thumb:hover,
+.detail-task-body::-webkit-scrollbar-thumb:hover,
+.detail-minutes-box::-webkit-scrollbar-thumb:hover,
+.task-who-dropdown::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+}

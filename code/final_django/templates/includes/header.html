@@ -1,0 +1,46 @@
+{% load static %}
+<header class="header animate-fade-in">
+  <div class="header-left">
+    <h1 class="header-title">
+      {% block page_title %}
+        {% if request.resolver_match.url_name == "home" %}
+            홈  
+        {% elif request.resolver_match.url_name == "meeting_create" %}
+            새 회의
+        {% elif request.resolver_match.url_name == "meeting_record" %}
+            새 회의
+        {% elif request.resolver_match.url_name == "meeting_transcript" %}
+            새 회의
+        {% elif request.resolver_match.url_name == "rendering" %}
+            새 회의
+        {% elif request.resolver_match.url_name == "meeting_detail" %}
+            회의 상세 조회
+        {% elif request.resolver_match.url_name == "list_all" %}
+            전체 회의 목록
+        {% elif request.resolver_match.url_name == "list_mine" %}
+            내가 참여한 회의
+        {% elif request.resolver_match.url_name == "list_dept" %}
+            부서원이 참여한 회의
+        {% else %}
+            관리자 홈
+        {% endif %}
+      {% endblock %}
+    </h1>
+  </div>
+
+  <div class="header-right">
+    <!-- 사용자 정보 박스 (두 번째 사진 스타일 적용) -->
+    <div class="header-user">
+      <img src="{% static 'img/icon-user.svg' %}" alt="user" class="user-icon">
+      <div class="header-user-info">
+        <span class="user-name">
+          {{ request.session.login_user_name }}님
+          {% if request.session.login_user_dept_name %}
+            ({{ request.session.login_user_dept_name }})
+          {% endif %}
+        </span>
+      </div>
+    </div>
+  </div>
+</header>
+ 

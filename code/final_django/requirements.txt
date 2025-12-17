@@ -1,0 +1,28 @@
+# === Django 기본 ===
+Django>=5.0
+djangorestframework>=3.16
+django-filter>=25.2
+django-storages>=1.14
+
+# === DB 드라이버 (MySQL/PostgreSQL 중 선택) ===
+mysqlclient>=2.2   # MySQL 사용 시
+
+# === 배포 ===
+gunicorn>=23.0
+whitenoise>=6.0
+
+# === AWS S3 / 외부 연동 ===
+boto3>=1.41
+httpx>=0.28
+
+# === google 
+google-api-python-client>=2.187.0
+google-auth-httplib2>=0.2.1
+google-auth-oauthlib>=1.2.3
+
+# === 문서 ===
+python-docx
+reportlab
+
+# === 기타 ===
+python-dotenv>=1.0

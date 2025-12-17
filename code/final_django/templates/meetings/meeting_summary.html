@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}회의 요약{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/meetings/meeting_transcript.css' %}">
+<link rel="stylesheet" href="{% static 'css/meetings/meeting_summary.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="meeting-transcript-page">
+
+  <!-- 상단 제목 -->
+  <div class="transcript-header-row">
+    <h2 class="record-title">{{ meeting.title }}</h2>
+    <div class="record-title-line"></div>
+  </div>
+
+  <!-- 좌우 레이아웃 -->
+  <div class="transcript-layout">
+
+    <!-- 왼쪽: 전문 (meeting_transcript와 동일) -->
+    <section class="transcript-left">
+      <div class="section-label">전문</div>
+
+      <div class="assign-transcript-box">
+        <div class="assign-transcript-scroll" id="assign-transcript-scroll">
+          {{ transcript_html|safe }}
+        </div>
+      </div>
+
+      <div class="assign-transcript-actions">
+        {% if meeting.record_url_id %}
+          <button
+            type="button"
+            class="text-link-button"
+            id="btn-audio-download"
+            data-meeting-id="{{ meeting.meeting_id }}">
+            음성 파일 다운로드
+          </button>
+        {% else %}
+          <button type="button" class="text-link-button text-link-disabled" disabled>
+            음성 파일 다운로드
+          </button>
+        {% endif %}
+
+        <button type="button" class="text-link-button" id="btn-copy-full-transcript">
+          전문 전체 복사
+        </button>
+      </div>
+    </section>
+
+    <!-- 오른쪽: 요약 / 태스크 / 회의록 탭 -->
+    <section class="transcript-right">
+
+    <div class="summary-tabs">
+        {# 현재 페이지: 요약 탭 – 굳이 url 태그 안 써도 됨 #}
+        <a href="#" class="summary-tab summary-tab-active">
+        요약
+        </a>
+
+        <a href="#" class="summary-tab">
+        태스크
+        </a>
+
+        {# 회의록 탭: 전문 페이지로 이동 #}
+        <a href="#" class="summary-tab">
+        회의록
+        </a>
+    </div>
+
+    <div class="summary-right-content">
+        <p class="summary-placeholder">요약 내용이 이 영역에 표시됩니다.</p>
+    </div>
+
+    </section>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_script %}
+<script src="{% static 'js/meetings/meeting_common.js' %}"></script>
+<script src="{% static 'js/meeting_summary.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,119 @@
+{% load static %}
+<link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}">
+
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <title>{% block title %}홈{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link rel="stylesheet" href="/static/css/base.css">
+    <link rel="stylesheet" href="/static/css/layout.css">
+
+    {% block extra_head %}{% endblock %}
+  </head>
+  <body class="bg-body">
+    <div class="app-root">
+      {# 좌측 사이드바 #}
+      {% block sidebar %}
+        {% include "includes/sidebar.html" %}
+      {% endblock %}
+
+      <div class="app-main">
+        {# 상단 헤더 #}
+        {% include "includes/header.html" %}
+
+        {# 메인 콘텐츠 영역 #}
+        <main class="app-content">
+          {% block content %}
+          <!-- 각 페이지 템플릿에서 재정의되는 영역 -->
+          {% endblock %}
+        </main>
+        <!-- 비밀번호 변경 모달 -->
+        <div id="pw-modal" class="modal-overlay hidden">
+        <div class="modal-box pw-modal-box">
+            <form id="pw-form" method="POST" action="{% url 'accounts:modify_pw' %}">
+            {% csrf_token %}
+
+            <!-- 제목 -->
+            <h2 class="pw-title">비밀번호 변경</h2>
+
+            <!-- 기존 비밀번호 입력 -->
+            <section class="pw-section">
+                <h3 class="pw-section-title">기존 비밀번호 입력</h3>
+
+                <div class="pw-input-group">
+                    <input
+                    type="password"
+                    id="current_pw"
+                    name="old_password"
+                    class="pw-input"
+                    placeholder="기존 비밀번호를 입력해 주세요"
+                    data-check-url="{% url 'accounts:check_old_pw' %}"
+                    />
+                    <!-- 파란 성공 메세지 -->
+                    <span id="current_pw_ok" class="pw-info-text">비밀번호가 일치합니다.</span>
+                    <!-- 에러 메세지 (submit 시 사용) -->
+                    <span id="current_pw_error" class="pw-error-text">비밀번호를 확인해주세요.</span>
+                </div>
+            </section>
+
+
+            <!-- 새 비밀번호 입력 -->
+            <section class="pw-section">
+                <h3 class="pw-section-title">새 비밀번호 입력</h3>
+                <p class="pw-hint">
+                알파벳 대/소문자, 숫자를 전부 포함한 8자 이상 15자 이하로 설정해 주세요.
+                </p>
+
+                <div class="pw-input-group">
+                <input
+                    type="password"
+                    id="new_pw"
+                    name="new_password"
+                    class="pw-input"
+                    placeholder="새 비밀번호를 입력해 주세요"
+                />
+                <!-- 파란 안내 -->
+                <span id="new_pw_ok" class="pw-info-text">올바른 형식입니다.</span>
+                <!-- 빨간 에러 (실시간/submit 둘 다에서 사용 가능) -->
+                <span id="new_pw_error" class="pw-error-text">비밀번호 형식을 맞추어주세요.</span>
+
+                </span>
+                </div>
+
+                <div class="pw-input-group">
+                <input
+                    type="password"
+                    id="new_pw2"
+                    name="new_password2"
+                    class="pw-input"
+                    placeholder="비밀번호를 확인해 주세요"
+                />
+                <!-- 파란 안내 -->
+                <span id="new_pw2_ok" class="pw-info-text">비밀번호가 일치합니다.</span>
+                <span id="new_pw2_error" class="pw-error-text">비밀번호를 확인해주세요.</span>
+                </div>
+            </section>
+
+            <!-- 버튼 영역 -->
+            <div class="pw-actions">
+                <button type="submit" class="btn-modal btn-primary">변경</button>
+                <button type="button" id="pw-cancel" class="btn-modal btn-secondary">
+                취소
+                </button>
+            </div>
+
+            <!-- 공통 에러: "모든 항목을 입력해 주세요." 전용 -->
+            <p id="pw_common_error" class="pw-error-text"></p>
+            </form>
+        </div>
+        </div>
+      </div>
+    </div>
+<script src="{% static 'js/sidebar.js' %}"></script>
+<script src="{% static 'js/google_auth.js' %}"></script>
+    {% block extra_script %}{% endblock %}
+  </body>
+</html>

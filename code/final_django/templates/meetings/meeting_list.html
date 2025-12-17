@@ -1,0 +1,221 @@
+﻿{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+{% with meeting_list_type|default:"all" as list_type %}
+  {% if list_type == "mine" %}
+    내가 참여한 회의
+  {% elif list_type == "dept" %}
+    부서원이 참여한 회의
+  {% else %}
+    전체 회의 목록
+  {% endif %}
+{% endwith %}
+{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/meetings/meeting_list.css' %}">
+{% endblock %}
+
+{% block content %}
+{% with meeting_list_type|default:"all" as list_type %}
+<div class="meeting-list-page">
+  <div class="meeting-list-toolbar">
+    <div class="meeting-search">
+      <div class="meeting-search-box">
+        <button
+          type="button"
+          id="search-filter-toggle"
+          class="search-filter-button"
+          aria-haspopup="true"
+          aria-expanded="false"
+        >
+          <img
+            src="{% static 'img/icon-filter.svg' %}"
+            alt="검색 조건"
+            class="filter-icon"
+          />
+        </button>
+
+        <span id="search-filter-label" class="search-filter-label">
+          제목
+        </span>
+
+        <input
+          id="search-input"
+          type="text"
+          class="search-input"
+          autocomplete="off"
+        />
+
+        <button
+          type="button"
+          id="search-clear-btn"
+          class="search-clear-btn"
+          style="display: none;"
+          aria-label="검색어 초기화"
+        >
+          x
+        </button>
+
+        <img
+          src="{% static 'img/icon-search.svg' %}"
+          alt="검색"
+          class="search-icon"
+        />
+
+        <div
+          id="search-filter-dropdown"
+          class="search-filter-dropdown"
+          aria-label="검색 조건"
+        >
+          <button type="button" class="search-filter-option is-active" data-field="title">
+            제목
+          </button>
+          <button type="button" class="search-filter-option" data-field="host">
+            주최자
+          </button>
+          <button type="button" class="search-filter-option" data-field="title_host">
+            제목 + 주최자
+          </button>
+          <button type="button" class="search-filter-option" data-field="datetime">
+            회의 일시
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="meeting-list-table-wrapper">
+    <table class="meeting-table">
+      <thead>
+        <tr>
+          <th class="col-no">번호</th>
+          <th class="col-datetime">
+            <button
+              type="button"
+              id="sort-date-button"
+              class="sort-button"
+              data-field="datetime"
+            >
+              <span>일시</span>
+              <span
+                id="sort-date-icon"
+                class="sort-icon sort-icon-down"
+              ></span>
+            </button>
+          </th>
+          <th class="col-title">
+            <button
+              type="button"
+              id="sort-title-button"
+              class="sort-button"
+              data-field="title"
+            >
+              <span>제목</span>
+              <span
+                id="sort-title-icon"
+                class="sort-icon sort-icon-none"
+                aria-hidden="true"
+              ></span>
+            </button>
+          </th>
+          <th class="col-place">장소</th>
+          <th class="col-host">주최자</th>
+          <th class="col-count">참여 인원</th>
+          {% if list_type == "all" %}
+          <th class="col-join">참여 여부</th>
+          {% endif %}
+        </tr>
+      </thead>
+      <tbody id="meeting-table-body">
+        {% for meeting in meetings %}
+        <tr
+          class="meeting-row"
+          data-meeting-id="{{ meeting.meeting_id }}"
+          data-title="{{ meeting.title|escape }}"
+          data-attendees="{{ meeting.attendee_names|default:''|escape }}"
+          data-datetime="{{ meeting.meet_date_time|date:'Y-m-d H:i' }}"
+          data-datetime-display="{{ meeting.meet_date_time|date:'Y.m.d H:i' }}"
+          data-place="{{ meeting.place|default:''|escape }}"
+          data-host="{{ meeting.host_name|escape }}"
+          {% if list_type == "all" %}
+          data-joined="{% if meeting.is_joined %}true{% else %}false{% endif %}"
+          {% endif %}
+        >
+          <td class="col-no">
+            {{ forloop.counter }}
+          </td>
+          <td class="col-datetime">
+            {{ meeting.meet_date_time|date:"Y.m.d H:i" }}
+          </td>
+          <td class="col-title">
+            <a
+              href="{% url 'meetings:meeting_detail' meeting_id=meeting.meeting_id %}"
+              class="title-link"
+            >
+              {{ meeting.title|truncatechars:20 }}
+            </a>
+          </td>
+          <td class="col-place">
+            {{ meeting.place|truncatechars:10 }}
+          </td>
+          <td class="col-host">
+            {{ meeting.host_name|default:"알 수 없음"|truncatechars:10 }}
+          </td>
+          <td class="col-count">
+            {{ meeting.attendee_count }}명
+          </td>
+          {% if list_type == "all" %}
+          <td class="col-join" data-join-text>
+            {% if meeting.is_joined %}
+              참여
+            {% else %}
+              미참여
+            {% endif %}
+          </td>
+          {% endif %}
+        </tr>
+        {% empty %}
+        <tr class="meeting-row-empty">
+          <td colspan="{% if list_type == "all" %}7{% else %}6{% endif %}" class="no-data-cell">
+            {% if list_type == "mine" %}
+              내가 참여한 회의가 없습니다.
+            {% elif list_type == "dept" %}
+              부서원이 참여한 회의가 없습니다.
+            {% else %}
+              등록된 회의가 없습니다.
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="meeting-pagination" id="meeting-pagination">
+      <button
+        type="button"
+        class="page-btn page-prev"
+        id="page-prev"
+      >
+        ◀
+      </button>
+
+      <div class="page-numbers" id="page-numbers"></div>
+
+      <button
+        type="button"
+        class="page-btn page-next"
+        id="page-next"
+      >
+        ▶
+      </button>
+    </div>
+  </div>
+</div>
+{% endwith %}
+{% endblock %}
+
+{% block extra_script %}
+<script src="{% static 'js/meetings/meeting_list.js' %}"></script>
+{% endblock %}

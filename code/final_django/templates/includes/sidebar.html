@@ -1,0 +1,127 @@
+{% load static %}
+
+<nav class="sidebar" id="main-sidebar">
+  <!-- 토글 버튼 -->
+  <button type="button" class="sidebar-toggle-btn" id="sidebar-toggle">
+    <span class="sidebar-toggle-icon">‹</span>
+  </button>
+
+  <!-- 로고 영역 -->
+  <div class="sidebar-header">
+    <div class="sidebar-logo">
+      <img
+        src="{% static 'img/logo.png' %}"
+        alt="말하는대로"
+        class="sidebar-logo-image"
+      />
+      <img
+        src="{% static 'img/favicon.png' %}"
+        alt="로고 아이콘"
+        class="sidebar-logo-icon"
+      />
+    </div>
+  </div>
+
+  <!-- 상단 메뉴 (홈 / 새 회의 / 전체 회의 목록) -->
+  <div class="sidebar-section">
+    <ul class="sidebar-menu">
+      <!-- 홈 -->
+      <li class="sidebar-item {% if request.resolver_match.app_name == 'core' and request.resolver_match.url_name == 'home' %}sidebar-item-active{% endif %}">
+        <a href="{% url 'core:home' %}" class="sidebar-link">
+          <span class="sidebar-icon sidebar-icon-home" aria-hidden="true"></span>
+          <span class="sidebar-link-text">홈</span>
+        </a>
+      </li>
+      <!-- 새 회의 -->
+      <li class="sidebar-item {% if request.resolver_match.app_name == 'meetings' and request.resolver_match.url_name == 'meeting_create' %}sidebar-item-active{% endif %}">
+        <a href="{% url 'meetings:meeting_create' %}" class="sidebar-link">
+          <span class="sidebar-icon sidebar-icon-add" aria-hidden="true"></span>
+          <span class="sidebar-link-text">새 회의</span>
+        </a>
+      </li>
+      <li class="sidebar-item collapsed-only collapsed-menu-item {% if request.resolver_match.app_name == 'meetings' and request.resolver_match.url_name == 'list_all' %}sidebar-item-active{% endif %}">
+        <a href="{% url 'meetings:list_all' %}" class="sidebar-link">
+          <span class="sidebar-icon sidebar-icon-list" aria-hidden="true"></span>
+          <span class="sidebar-link-text">전체 회의 목록</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <!-- 전체 회의 목록 (접힘/펼침) -->
+  <div class="sidebar-section">
+    <button type="button" class="sidebar-collapse {% if request.resolver_match.app_name == 'meetings' and request.resolver_match.url_name == 'list_all' %}sidebar-item-active{% endif %}" data-url="{% url 'meetings:list_all' %}">
+      <div class="sidebar-collapse-left">
+        <span class="sidebar-icon sidebar-icon-list" aria-hidden="true"></span>
+        <span class="sidebar-section-title">전체 회의 목록</span>
+      </div>
+      <span class="sidebar-collapse-icon">▼</span>
+    </button>
+
+    <ul class="sidebar-menu sidebar-menu-nested">
+      <!-- 하위: 내가 참여한 회의 -->
+      <li class="sidebar-item sidebar-item-child {% if request.resolver_match.app_name == 'meetings' and request.resolver_match.url_name == 'list_mine' %}sidebar-item-active{% endif %}">
+        <a href="{% url 'meetings:list_mine' %}" class="sidebar-link">
+          <span class="sidebar-link-text">내가 참여한 회의</span>
+        </a>
+      </li>
+
+      <!-- 하위: 부서원이 참여한 회의 -->
+      <li class="sidebar-item sidebar-item-child {% if request.resolver_match.app_name == 'meetings' and request.resolver_match.url_name == 'list_dept' %}sidebar-item-active{% endif %}">
+        <a href="{% url 'meetings:list_dept' %}" class="sidebar-link">
+          <span class="sidebar-link-text">부서원이 참여한 회의</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <!-- 오늘의 회의 -->
+  <div class="sidebar-section">
+    <p class="sidebar-section-title">오늘의 회의</p>
+
+    <div class="sidebar-meeting-list">
+      {% for m in today_meetings %}
+        <a href="{% url 'meetings:meeting_detail' m.meeting_id %}" class="meeting-card">
+          <div class="meeting-card-icon">
+            <img
+              src="{% static 'img/icon-mic.svg' %}"
+              alt=""
+              class="meeting-icon-image"
+            />
+          </div>
+          <div class="meeting-card-body">
+            <p class="meeting-card-title">
+              {{ m.title|truncatechars:13 }}
+            </p>
+            <p class="meeting-card-meta">
+              {{ m.meet_date_time|date:"Y.m.d H:i" }} · {{ m.time_ago }}
+            </p>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- 하단 링크 -->
+  <div class="sidebar-footer">
+    <ul class="sidebar-menu">
+      {% if request.session.login_user_admin %}
+      <li class="sidebar-item">
+        <a href="{% url 'core:admin_home' %}" class="sidebar-link sidebar-link-footer">
+          <span class="sidebar-link-text">관리자 홈</span>
+        </a>
+      </li>
+      {% endif %}
+      <li class="sidebar-item">
+        <a href="{% url 'accounts:logout' %}" class="sidebar-link sidebar-link-footer">
+          <span class="sidebar-link-text">로그아웃</span>
+        </a>
+      </li>
+      <li class="sidebar-item">
+        <a href="#" id="modify-pw-link" class="sidebar-link sidebar-link-footer">
+          <span class="sidebar-link-text">비밀번호 변경</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>

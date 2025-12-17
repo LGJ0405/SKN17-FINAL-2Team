@@ -1,0 +1,304 @@
+/* ===== 페이지 전체 컨테이너 ===== */
+.record-page {
+  padding: 16px 32px;
+  background-color: transparent;
+  box-sizing: border-box;
+  max-width: 900px;
+  margin: 0 auto;
+  height: calc(100vh - 32px);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow: hidden;
+}
+
+/* ===== 상단 회의 정보 헤더 ===== */
+.record-header {
+  background-color: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 4px 4px #00000040;
+  padding: 16px 24px;
+  flex-shrink: 0;
+}
+
+.record-title {
+  margin: 0 0 12px 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #334155;
+  font-family: "LINE Seed KR", "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.record-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.record-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.record-meta-icon-img {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.record-meta-text {
+  font-size: 15px;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+/* ===== 업로드 폼 영역 ===== */
+#upload-form {
+  background-color: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 4px 4px #00000040;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* ===== 녹음 섹션 ===== */
+.recording-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.recording-title,
+.upload-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #334155;
+  font-family: "LINE Seed KR", "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.recording-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 20px;
+  background-color: #f8fafc;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+}
+
+/* 녹음 버튼 공통 스타일 */
+.record-btn,
+.pause-btn,
+.stop-btn {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.record-btn:disabled,
+.pause-btn:disabled,
+.stop-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* 녹음 버튼 */
+.record-btn {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: #ffffff;
+}
+
+.record-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+}
+
+.record-btn.recording {
+  animation: pulse-red 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-red {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 15px rgba(239, 68, 68, 0);
+  }
+}
+
+/* 일시정지 버튼 */
+.pause-btn {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: #ffffff;
+}
+
+.pause-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+}
+
+/* 정지 버튼 */
+.stop-btn {
+  background: linear-gradient(135deg, #64748b 0%, #475569 100%);
+  color: #ffffff;
+}
+
+.stop-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #475569 0%, #334155 100%);
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(100, 116, 139, 0.4);
+}
+
+/* 아이콘 크기 */
+.record-icon,
+.pause-icon,
+.stop-icon {
+  width: 32px;
+  height: 32px;
+}
+
+/* 타이머 */
+.recording-timer {
+  font-size: 28px;
+  font-weight: 700;
+  color: #334155;
+  font-family: "Courier New", monospace;
+  min-width: 90px;
+  text-align: center;
+}
+
+/* 녹음 상태 메시지 */
+.recording-status {
+  text-align: center;
+  font-size: 15px;
+  color: #64748b;
+  min-height: 24px;
+}
+
+.recording-status.active {
+  color: #ef4444;
+  font-weight: 600;
+}
+
+/* ===== 업로드 섹션 ===== */
+.upload-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ===== 드롭존 영역 ===== */
+.dropzone {
+  border: 2px dashed #cbd5e1;
+  border-radius: 16px;
+  padding: 40px 24px;
+  text-align: center;
+  color: #64748b;
+  font-size: 15px;
+  font-weight: 500;
+  background-color: #f8fafc;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  position: relative;
+}
+
+.dropzone:hover {
+  border-color: #3b82f6;
+  background-color: #f0f9ff;
+  color: #334155;
+}
+
+.dropzone.highlight {
+  background-color: #e0f2fe;
+  border-color: #2563eb;
+  color: #1e40af;
+  border-width: 3px;
+}
+
+/* ===== 미리보기 영역 ===== */
+.preview {
+  margin-top: 16px;
+  padding: 12px 16px;
+  background-color: #f0f9ff;
+  border-radius: 12px;
+  border: 1px solid #bae6fd;
+  font-size: 14px;
+  color: #334155;
+  font-weight: 500;
+  display: none;
+}
+
+.preview:not(:empty) {
+  display: block;
+}
+
+.preview div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.preview div::before {
+  content: "📁";
+  font-size: 18px;
+}
+
+/* ===== 업로드 버튼 ===== */
+#upload-btn {
+  align-self: center;
+  width: 200px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+  border: none;
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+  transition: all 0.2s ease;
+  font-family: "LINE Seed KR", "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  margin-top: 8px;
+}
+
+#upload-btn:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+  transform: translateY(-2px);
+}
+
+#upload-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+#upload-btn:disabled {
+  background: linear-gradient(135deg, #94a3b8 0%, #cbd5e1 100%);
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+

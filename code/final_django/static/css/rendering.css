@@ -1,0 +1,188 @@
+/* ==== 렌더링 페이지 전용 CSS ==== */
+
+/* 전체 페이지 래퍼: 가운데 정렬 */
+.processing-page {
+  max-width: 1120px;          /* 메인 컨텐츠 최대 폭 */
+  margin: 0 auto;             /* 좌우 가운데 정렬 */
+  padding: 40px 24px 72px;    /* 위/양옆/아래 여백 */
+  box-sizing: border-box;
+}
+
+/* 상단 타이틀 영역 */
+.processing-header {
+  text-align: center;         /* 제목/설명 가운데 정렬 */
+  margin-bottom: 32px;
+}
+
+.processing-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0 0 12px;
+}
+
+.processing-subtitle {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.7;
+  color: #6b7280;
+}
+
+/* 메인 래퍼: 한 컬럼으로 카드만 가운데 두기 */
+.processing-main {
+  width: 100%;
+}
+
+/* 중앙 카드 */
+.processing-card {
+  max-width: 1040px;          /* 카드 최대 폭 */
+  margin: 0 auto;             /* 카드 자체도 가운데 정렬 */
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 32px 40px 28px;
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.12);
+  box-sizing: border-box;
+}
+
+/* 비주얼 영역 */
+.processing-visual {
+  border-radius: 16px;
+  background: linear-gradient(135deg, #dbeafe 0%, #bae6fd 100%);
+  padding: 36px 28px;
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.processing-visual-bar {
+  width: 80%;
+  max-width: 640px;
+  min-height: 72px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.16);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+  box-sizing: border-box;
+}
+
+.visual-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: #cbd5e1;
+}
+
+.visual-dot-center {
+  width: 52px;
+  height: 52px;
+  background: #3b82f6;
+}
+
+/* 프로그레스 바 */
+.processing-progress {
+  margin-bottom: 28px;
+}
+
+.processing-progress-track {
+  position: relative;
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background: #e5e7eb;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.processing-progress-bar {
+  position: absolute;
+  left: -40%;
+  top: 0;
+  bottom: 0;
+  width: 40%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #3b82f6, #60a5fa, #38bdf8);
+  animation: processing-progress 1.4s ease-in-out infinite;
+}
+
+@keyframes processing-progress {
+  0% {
+    transform: translateX(0%);
+  }
+  50% {
+    transform: translateX(180%);
+  }
+  100% {
+    transform: translateX(360%);
+  }
+}
+
+.processing-progress-text {
+  margin: 0;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* 하단 3단 설명 */
+.processing-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.processing-step {
+  background: #f8fafc;
+  border-radius: 14px;
+  padding: 14px 16px;
+  box-sizing: border-box;
+  border: 1px solid #e0f2fe;
+}
+
+.processing-step-number {
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: #dbeafe;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: #1e40af;
+  margin-bottom: 8px;
+}
+
+.processing-step-title {
+  font-size: 13px;
+  font-weight: 600;
+  margin: 0 0 6px;
+}
+
+.processing-step-desc {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #6b7280;
+}
+
+/* 반응형: 화면이 좁아질 때 카드 폭과 그리드 조정 */
+@media (max-width: 1024px) {
+  .processing-page {
+    padding: 32px 16px 48px;
+  }
+
+  .processing-card {
+    padding: 24px 20px 24px;
+  }
+
+  .processing-visual-bar {
+    width: 100%;
+    padding: 0 24px;
+  }
+
+  .processing-steps {
+    grid-template-columns: 1fr;
+  }
+}

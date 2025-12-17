@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}관리자 홈{% endblock %}
+
+{% block sidebar %}
+  {% include "includes/admin_sidebar.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="admin-layout">
+
+  <div class="admin-body">
+
+    {# ========== 왼쪽: 부서원 목록 ========== #}
+    <section class="admin-panel admin-panel-left">
+      <header class="admin-panel-header">
+        <h2 class="admin-panel-title" id="admin-dept-title"></h2>
+      </header>
+
+      <div class="admin-table-card">
+        <table class="admin-table" id="admin-member-table">
+          <thead>
+            <tr>
+              <th class="col-no">번호</th>
+              <th class="col-name">성명</th>
+              <th class="col-id">ID</th>
+              <th class="col-dept">부서</th>
+              <th class="col-birth">생년월일</th>
+            </tr>
+          </thead>
+          <tbody id="admin-member-tbody">
+            {% if members %}
+              {% for member in members %}
+                <tr class="admin-member-row" data-dept-id="{{ member.dept.dept_id }}" data-work-part="{{ member.work_part }}" data-admin-yn="{{ member.admin_yn }}">
+                  <td class="col-no">{{ forloop.counter }}</td>
+                  <td class="col-name">{{ member.name }}</td>
+                  <td class="col-id">{{ member.user_id }}</td>
+                  <td class="col-dept">{{ member.dept.dept_name }}</td>
+                  <td class="col-birth">{{ member.birth_date|date:"Y.m.d" }}</td>
+                </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td colspan="5" class="admin-table-empty">
+                  현재 표시할 부서원이 없습니다.
+                </td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="admin-table-actions">
+        {# ★ 반드시 이 id 사용 ★ #}
+        <button type="button" class="btn-admin-add" id="btn-admin-add">
+          추가
+        </button>
+      </div>
+    </section>
+
+    {# ========== 오른쪽: 등록/수정 폼(열고 닫는 영역) ========== #}
+    {# ★ 반드시 이 id 사용 ★ #}
+    <section class="admin-panel admin-panel-right collapsed" id="admin-panel-right">
+      <button type="button" class="admin-panel-toggle" id="btn-panel-toggle">
+        <span id="toggle-icon">◀</span>
+      </button>
+
+      <form id="admin-employee-form" class="admin-form">
+        <input type="hidden" id="form-mode" value="create">
+        <input type="hidden" id="form-user-id" value="">
+
+        <h3 id="form-title" class="admin-form-title" style="display:none;"></h3>
+
+        <div class="admin-form-field-group">
+          {# 이름과 ID를 같은 줄에 배치 #}
+          <div class="admin-form-row">
+            <div class="admin-form-field admin-form-field-half">
+              <label for="emp-name" class="admin-form-label">이름</label>
+              <input
+                type="text"
+                id="emp-name"
+                name="name"
+                class="admin-form-input"
+                pattern="^[가-힣]{1,32}$"
+                title="한글만 입력 가능합니다 (1~32자)"
+                required
+              />
+            </div>
+
+            <div class="admin-form-field admin-form-field-half">
+              <label for="emp-id" class="admin-form-label">ID</label>
+              <input
+                type="text"
+                id="emp-id"
+                name="user_id"
+                class="admin-form-input"
+                pattern="^[a-z0-9]{6,20}$"
+                title="영소문자와 숫자만 입력 가능합니다 (6~20자)"
+                required
+              />
+            </div>
+          </div>
+
+          {# 생년월일과 비밀번호 초기화 버튼을 같은 줄에 배치 #}
+          <div class="admin-form-row">
+            <div class="admin-form-field admin-form-field-birth">
+              <label for="emp-birth" class="admin-form-label">생년월일</label>
+              <input
+                type="text"
+                id="emp-birth"
+                name="birth_date"
+                class="admin-form-input"
+                placeholder="생년월일 8자리"
+                pattern="^\d{8}$"
+                title="8자리 숫자로 입력해주세요 (예: 19900101)"
+                maxlength="8"
+                required
+              />
+            </div>
+
+            <div class="admin-form-field admin-form-field-reset-pw">
+              <label class="admin-form-label">&nbsp;</label>
+              <button
+                type="button"
+                class="btn-admin-reset-pw"
+                id="btn-admin-reset-pw"
+                style="display:none;"
+              >
+                비밀번호 초기화
+              </button>
+            </div>
+          </div>
+
+          <div class="admin-form-field">
+            <label for="emp-dept" class="admin-form-label">부서</label>
+            <select
+              id="emp-dept"
+              name="dept_id"
+              class="admin-form-input"
+              required
+            >
+              {% for dept in departments %}
+                <option value="{{ dept.dept_id }}">{{ dept.dept_name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="admin-form-field">
+            <label for="emp-role" class="admin-form-label">업무</label>
+            <input
+              type="text"
+              id="emp-role"
+              name="work_part"
+              class="admin-form-input"
+              pattern="^[가-힣a-zA-Z\s]{1,15}$"
+              title="한글 또는 영어만 입력 가능합니다 (1~15자)"
+              maxlength="15"
+              required
+            />
+          </div>
+
+          {# 관리자 권한을 업무 밑에 배치 #}
+          <div class="admin-form-field">
+            <label class="admin-form-checkbox-label">
+              <input
+                type="checkbox"
+                id="emp-admin"
+                name="admin_yn"
+                class="admin-form-checkbox"
+              />
+              <span>관리자 권한 부여</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="admin-form-actions">
+          <button type="submit" class="btn-admin-primary" id="btn-admin-submit">
+            등록
+          </button>
+          <button
+            type="button"
+            class="btn-admin-secondary"
+            id="btn-admin-close"
+          >
+            취소
+          </button>
+        </div>
+      </form>
+    </section>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_script %}
+  <script src="{% static 'js/admin_home.js' %}"></script>
+{% endblock %}

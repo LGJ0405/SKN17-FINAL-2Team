@@ -1,0 +1,240 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}새 회의{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/meetings/meeting_create.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="meeting-create-page">
+   <form method="post" enctype="multipart/form-data" class="meeting-form">
+      {% csrf_token %}
+     <div class="meeting-columns">
+      <!-- ================= 왼쪽 컬럼 ================= -->
+      <div class="meeting-left">
+        <!-- 제목 -->
+        <section class="field-section">
+          <label for="id_title" class="field-label">제목</label>
+          <input
+            id="id_title"
+            name="title"
+            type="text"
+            class="field-input"
+            placeholder="회의 제목을 입력하세요"
+            required
+            maxlength="30"
+          />
+        </section>
+
+        <!-- 일시 -->
+        <section class="field-section">
+          <label class="field-label">일시</label>
+          <div class="datetime-split-row">
+            <input
+              id="id_meet_date"
+              type="date"
+              class="field-input datetime-split-input"
+              required
+            />
+            <input
+              id="id_meet_time"
+              type="time"
+              class="field-input datetime-split-input"
+              required
+            />
+          </div>
+          <input
+            id="id_meet_date_time"
+            name="meet_date_time"
+            type="hidden"
+          />
+        </section>
+
+        <!-- 장소 -->
+        <section class="field-section">
+          <label for="id_place" class="field-label">장소</label>
+          <input
+            id="id_place"
+            name="place"
+            type="text"
+            class="field-input"
+            placeholder="회의실을 입력하세요"
+            required
+            maxlength="30"
+          />
+        </section>
+
+        <!-- ================== 특화 도메인 선택 ================== -->
+        <section class="domain-section">
+          <div class="domain-header">
+            <h2 class="domain-title">특화 도메인 선택</h2>
+        </div>
+
+        <div class="domain-body">
+            <!-- 직접 표시되는 라디오 버튼 -->
+            <div class="domain-radio-list">
+                <label class="domain-radio-item">
+                <input
+                    type="radio"
+                    name="domains"
+                    value="IT"
+                    data-domain-radio
+                />
+                <span>IT</span>
+                </label>
+                <label class="domain-radio-item">
+                <input
+                    type="radio"
+                    name="domains"
+                    value="마케팅"
+                    data-domain-radio
+                />
+                <span>마케팅</span>
+                </label>
+                <label class="domain-radio-item">
+                <input
+                    type="radio"
+                    name="domains"
+                    value="디자인"
+                    data-domain-radio
+                />
+                <span>디자인</span>
+                </label>
+                <label class="domain-radio-item">
+                <input
+                    type="radio"
+                    name="domains"
+                    value="회계"
+                    data-domain-radio
+                />
+                <span>회계</span>
+                </label>
+            </div>
+        </div>
+        </section>
+
+      </div>
+
+      <!-- ================= 오른쪽 컬럼 ================= -->
+      <div class="meeting-right">
+        <!-- 참석자 선택 영역 -->
+        <section class="attendee-section">
+          <div class="attendee-header">
+            <h2 class="attendee-title">참석자</h2>
+            <p class="attendee-sub">
+              조직도에서 참석자를 선택하여 오른쪽으로 이동시킬 수 있습니다.
+            </p>
+
+            <input
+                id="attendee-validator"
+                type="text"
+                class="attendee-validator-input"
+                aria-hidden="true"
+            />
+            {# 로그인 유저 정보 – JS에서 읽어 사용 #}
+            {% if login_user %}
+                <input type="hidden" id="login-user-id" value="{{ login_user.user_id }}">
+                <input
+                type="hidden"
+                id="login-user-name"
+                value="{{ login_user.name }} ({{ login_user.dept.dept_name }})"
+                >
+            {% endif %}
+          </div>
+
+          <div class="attendee-layout">
+            <!-- 좌측: 조직 트리 -->
+            <div class="attendee-tree">
+              <ul class="tree-root">
+                <li>
+                  <span class="tree-label root-label">주식회사 말하는대로</span>
+                  <ul>
+                    {# departments : view에서 넘긴 부서 리스트 #}
+                    {% for dept in departments %}
+                        <li>
+                            <span class="tree-label">{{ dept.dept_name }}</span>
+                            <ul>
+                            {# 각 부서의 유저들 #}
+                            {% for user in dept.users.all %}
+                                <li
+                                class="tree-user"
+                                data-user-id="{{ user.user_id }}"
+                                data-user-name="{{ user.name }} ({{ dept.dept_name}})"
+                                >
+                                {{ user.name }}
+                                </li>
+                            {% empty %}
+                                <li class="tree-user-empty">소속 유저 없음</li>
+                            {% endfor %}
+                            </ul>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    </li>
+                </ul>
+            </div>
+            <!-- 가운데: 선택 초기화 -->
+            <div class="attendee-middle">
+              <button
+                type="button"
+                class="btn-reset-attendee"
+                id="btn-clear-attendees"
+              >
+                선택 <br>초기화
+              </button>
+            </div>
+
+            <!-- 우측: 선택된 참석자 리스트 -->
+            <div class="attendee-selected">
+              <div class="attendee-selected-header">
+                <span class="attendee-selected-title">선택된 참석자</span>
+                <span id="attendee-count" class="attendee-count-badge">0명</span>
+              </div>
+              <ul id="selected-attendee-list" class="attendee-list">
+                <!-- JS에서 li 추가 -->
+              </ul>
+            </div>
+            <div id="attendee-error" class="field-error" style="display:none;">
+            참석자를 선택해주세요.
+            </div>
+          </div>
+        </section>
+
+        <!-- 비공개 회의 + 버튼 -->
+        <section class="right-bottom">
+          <div class="private-block">
+            <label class="private-label">
+               <input
+                    type="checkbox"
+                    name="is_private"
+                    id="id_is_private"
+                    class="private-checkbox"
+               />
+               <span class="private-icon-wrapper">
+                <!-- 단색 아이콘 대신 사각형 사용 -->
+                <span class="private-icon"></span>
+              </span>
+              <span class="">비공개 회의</span>
+            </label>
+            <p class="private-desc">
+              체크하지 않으면, 회의 참석자의 부서원 전체에게 회의가 공개됩니다.
+            </p>
+          </div>
+
+          <button type="submit" class="btn-start-meeting">
+            회의 시작
+          </button>
+        </section>
+      </div>
+    </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_script %}
+<script src="{% static 'js/meetings/meeting_create.js' %}"></script>
+{% endblock %}

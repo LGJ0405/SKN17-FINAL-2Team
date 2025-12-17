@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% load static %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/rendering.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="processing-page">
+  <header class="processing-header">
+    <h1 class="processing-title">요약/태스크 생성 중입니다</h1>
+    <p class="processing-subtitle">전문을 분석해 요약과 태스크를 생성하고 있습니다. 잠시만 기다려 주세요.</p>
+  </header>
+
+  <main class="processing-main">
+    <section class="processing-card">
+      <div class="processing-visual">
+        <div class="processing-visual-bar">
+          <div class="visual-dot visual-dot-left"></div>
+          <div class="visual-dot visual-dot-center"></div>
+          <div class="visual-dot visual-dot-right"></div>
+        </div>
+      </div>
+
+      <div class="processing-progress">
+        <div class="processing-progress-track">
+          <div class="processing-progress-bar"></div>
+        </div>
+        <p class="processing-progress-text">생성이 완료되면 자동으로 상세 페이지로 이동합니다.</p>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+  (function () {
+    const meetingId = "{{ meeting_id }}";
+
+    async function runSllmAndRedirect() {
+      try {
+        const res = await fetch(`/meetings/${meetingId}/sllm/prepare/`);
+        const data = await res.json();
+        if (data.status === "done") {
+          window.location.href = `/meetings/${meetingId}/detail`;
+        } else if (data.status === "error") {
+          alert(data.message || "요약 처리 중 오류가 발생했습니다.");
+          window.location.href = `/meetings/${meetingId}/transcript/`;
+        }
+      } catch (e) {
+        console.error(e);
+        alert("요약 처리 중 오류가 발생했습니다.");
+        window.location.href = `/meetings/${meetingId}/transcript/`;
+      }
+    }
+
+    runSllmAndRedirect();
+  })();
+</script>
+{% endblock %}

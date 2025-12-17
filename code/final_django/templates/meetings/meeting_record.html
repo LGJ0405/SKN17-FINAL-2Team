@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}새 회의{% endblock %}
+{% block page_title %}새 회의{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/meetings/meeting_record.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="record-page">
+
+  <!-- ================= 상단: 회의 정보 영역 ================= -->
+  <header class="record-header">
+    <h2 class="record-title">{{ meeting.title }}</h2>
+
+    <div class="record-meta">
+      <!-- 일정/장소 줄 -->
+      <div class="record-meta-row">
+        <img src="{% static 'img/icon-calendar.svg' %}" class="record-meta-icon-img" alt="calendar">
+        <span class="record-meta-text">
+          {{ meeting.meet_date_time|date:"Y.m.d H:i" }}
+          · {{ meeting.place }}
+        </span>
+      </div>
+
+      <!-- 참석자 줄 -->
+      <div class="record-meta-row">
+        <img src="{% static 'img/icon-person.svg' %}" class="record-meta-icon-img" alt="attendees">
+        <span class="record-meta-text">
+          {% for a in attendees %}
+            {{ a.user.name }} ({{ a.user.dept.dept_name }})
+            {% if not forloop.last %}, {% endif %}
+          {% empty %}
+            참석자가 없습니다.
+          {% endfor %}
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= 녹음 및 업로드 영역 ================= -->
+  <form id="upload-form" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <!-- 녹음 컨트롤 (녹음 허용 여부에 따라 표시) -->
+    {% if allow_recording %}
+    <div class="recording-section">
+      <h3 class="recording-title">음성 녹음</h3>
+      <div class="recording-controls">
+        <button type="button" id="btn-record" class="record-btn" title="녹음 시작">
+          <svg class="record-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+            <line x1="12" y1="19" x2="12" y2="23"/>
+            <line x1="8" y1="23" x2="16" y2="23"/>
+          </svg>
+        </button>
+
+        <button type="button" id="btn-pause" class="pause-btn" disabled title="일시정지">
+          <svg class="pause-icon" viewBox="0 0 24 24" fill="currentColor">
+            <rect x="6" y="4" width="4" height="16" rx="1"/>
+            <rect x="14" y="4" width="4" height="16" rx="1"/>
+          </svg>
+        </button>
+
+        <button type="button" id="btn-stop" class="stop-btn" disabled title="녹음 중지">
+          <svg class="stop-icon" viewBox="0 0 24 24" fill="currentColor">
+            <rect x="6" y="6" width="12" height="12" rx="2"/>
+          </svg>
+        </button>
+
+        <div class="recording-timer" id="recording-timer">00:00</div>
+      </div>
+      <div id="recording-status" class="recording-status"></div>
+    </div>
+    {% else %}
+    <div class="recording-section recording-disabled">
+      <h3 class="recording-title">음성 녹음</h3>
+      <p class="detail-empty-text">회의 시작 시간이 오래되어 녹음 기능은 비활성화되어 있습니다. 음성 파일 업로드는 가능합니다.</p>
+    </div>
+    {% endif %}
+
+    <!-- 파일 업로드 -->
+    <div class="upload-section">
+      <h3 class="upload-title">파일 업로드</h3>
+      <div id="dropzone" class="dropzone">
+        📂 여기로 파일을 드래그하거나 클릭해서 선택하세요
+        <input id="hidden-file" name="file" type="file" hidden accept=".wav"/>
+        <div id="preview" class="preview"></div>
+      </div>
+    </div>
+
+    <button id="upload-btn" type="button">음성 파일 업로드</button>
+  </form>
+{% endblock %}
+{% block extra_script %}
+<script src="{% static 'js/meetings/meeting_record.js' %}"></script>
+{% endblock %}
+

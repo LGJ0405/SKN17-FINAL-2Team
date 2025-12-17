@@ -1,0 +1,373 @@
+/* ========= 공통 기본 스타일 ========= */
+
+:root {
+  --color-bg: #f0f9ff;
+  --color-bg-alt: #fefeff;
+  --color-sidebar-bg: #ffffff;
+  --color-sidebar-border: #e0f2fe;
+  --color-header-bg: #ffffff;
+  --color-header-border: #e0f2fe;
+
+  --color-text: #1f2937;
+  --color-text-muted: #6b7280;
+
+  --color-primary: #3b82f6;
+  --color-primary-hover: #2563eb;
+  --color-accent-soft: #e0f2fe;
+  --color-accent-strong: #60a5fa;
+
+  --color-border-subtle: #e5e7eb;
+  --shadow-soft: 0 10px 25px rgba(59, 130, 246, 0.1);
+
+  --animate-spin: spin 1s linear infinite;
+  --shimmer-width: 160px;
+  --gap: 2rem;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  color: var(--color-text);
+  background-color: var(--color-bg);
+}
+
+/* Tailwind의 .all-\[unset\] 유틸리티를 그대로 구현 */
+.all-\[unset\] {
+  all: unset;
+}
+
+/* 배경 색 유틸리티 비슷한 느낌 */
+.bg-body {
+  background-color: var(--color-bg);
+}
+
+/* 버튼 공통 스타일 */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease,
+    color 0.15s ease, box-shadow 0.15s ease;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  color: #ffffff;
+  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.2);
+}
+
+.btn-primary:hover {
+  background-color: var(--color-primary-hover);
+  box-shadow: 0 12px 28px rgba(37, 99, 235, 0.3);
+}
+
+.btn-outline {
+  background-color: var(--color-bg-alt);
+  border-color: var(--color-border-subtle);
+  color: var(--color-text);
+}
+
+.btn-outline:hover {
+  background-color: var(--color-accent-soft);
+}
+
+/* ========= tailwind.css에서 가져온 애니메이션 구현 ========= */
+
+.animate-fade-in {
+  animation: fade-in 1s var(--animation-delay, 0s) ease forwards;
+}
+
+.animate-fade-up {
+  animation: fade-up 1s var(--animation-delay, 0s) ease forwards;
+}
+
+.animate-marquee {
+  animation: marquee var(--duration) infinite linear;
+}
+
+.animate-marquee-vertical {
+  animation: marquee-vertical var(--duration) linear infinite;
+}
+
+.animate-shimmer {
+  animation: shimmer 8s infinite;
+}
+
+.animate-spin {
+  animation: var(--animate-spin);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+@keyframes image-glow {
+  0% {
+    opacity: 0;
+    animation-timing-function: cubic-bezier(0.74, 0.25, 0.76, 1);
+  }
+
+  10% {
+    opacity: 0.7;
+    animation-timing-function: cubic-bezier(0.12, 0.01, 0.08, 0.99);
+  }
+
+  to {
+    opacity: 0.4;
+  }
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes fade-up {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes shimmer {
+  0%,
+  90%,
+  to {
+    background-position: calc(-100% - var(--shimmer-width)) 0;
+  }
+
+  30%,
+  60% {
+    background-position: calc(100% + var(--shimmer-width)) 0;
+  }
+}
+
+@keyframes marquee {
+  0% {
+    transform: translate(0);
+  }
+
+  to {
+    transform: translateX(calc(-100% - var(--gap)));
+  }
+}
+
+@keyframes marquee-vertical {
+  0% {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(calc(-100% - var(--gap)));
+  }
+}
+
+/* ===== 비밀번호 변경 모달 공통 ===== */
+
+.hidden {
+  display: none;
+}
+
+/* 전체 오버레이 */
+.modal-overlay {
+  position: fixed;
+  inset: 0; /* top, right, bottom, left */
+  background: rgba(15, 23, 42, 0.35);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal-overlay.hidden {
+  display: none;
+}
+
+/* 모달 박스 */
+.modal-box.pw-modal-box {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fbff 100%);
+  border-radius: 18px;
+  padding: 32px 32px 28px;
+  width: 460px;
+  max-width: calc(100% - 40px);
+  border: 1px solid #dbeafe;
+  box-shadow: 0 14px 36px rgba(59, 130, 246, 0.16);
+  box-sizing: border-box;
+  text-align: left; /* 입력/안내 문구를 왼쪽 정렬 */
+}
+
+/* 제목 */
+.pw-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 24px 0;
+}
+
+/* 섹션 */
+.pw-section {
+  margin-bottom: 22px;
+}
+
+.pw-section-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0 0 10px 0;
+}
+
+/* 안내 문구 */
+.pw-hint {
+  margin: 0 0 12px 0;
+  font-size: 13px;
+  color: #2563eb;
+}
+
+/* 입력 그룹 */
+.pw-input-group {
+  margin-bottom: 10px;
+}
+
+/* 입력창 */
+.pw-input {
+  width: 100%;
+  height: 48px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 2px solid #e0f2fe;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fbff 100%);
+  font-size: 14px;
+  font-weight: 500;
+  color: #0f172a;
+  outline: none;
+  box-sizing: border-box;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.08);
+  transition: all 0.25s ease;
+}
+
+.pw-input::placeholder {
+  color: #94a3b8;
+}
+
+.pw-input:focus {
+  border-color: #3b82f6;
+  background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.14), 0 4px 16px rgba(59, 130, 246, 0.18);
+  transform: translateY(-1px);
+}
+
+/* 에러 텍스트 */
+.pw-error-text {
+  display: none;
+  margin-top: 6px;
+  font-size: 12px;
+  color: #e53935;
+  text-align: left;
+}
+
+/* JS에서 이 클래스를 붙이면 나타나게 */
+.pw-error-text.visible {
+  display: block;
+}
+
+/* 파란 안내 텍스트 (비밀번호가 일치합니다.) */
+.pw-info-text {
+  display: none;
+  margin-top: 6px;
+  font-size: 12px;
+  color: #3b82f6;  /* 파란색 */
+  text-align: left;
+}
+.pw-info-text.visible {
+  display: block;
+}
+
+/* 버튼 영역 */
+.pw-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 14px;
+  margin-top: 28px;
+}
+
+/* 모달 버튼 */
+.btn-modal {
+  min-width: 120px;
+  height: 48px;
+  padding: 0 16px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.2;
+  box-sizing: border-box;
+  margin: 0;
+}
+
+/* 변경 버튼 */
+.pw-actions .btn-primary {
+  background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+  color: #ffffff;
+  border: 1px solid transparent;
+  box-shadow: 0 4px 10px rgba(59, 130, 246, 0.12);
+  position: relative;
+  top: -4px;
+}
+
+.pw-actions .btn-primary:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+  top: -1px;
+}
+
+.pw-actions .btn-secondary {
+  background: #ffffff;
+  color: #1f2937;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.08);
+}
+
+.pw-actions .btn-secondary:hover {
+  background: var(--color-accent-soft);
+  color: #0f172a;
+  transform: translateY(-1px);
+}

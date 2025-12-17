@@ -1,0 +1,346 @@
+/* 페이지 전체 컨테이너 */
+.meeting-transcript-page {
+  background: #ffffff;
+  border-radius: 10px;
+  border: 1px solid #e0f2fe;
+  padding: 24px 32px;
+  box-sizing: border-box;
+  height: 100%;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.06);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* 상단 제목 + 우측 라인 */
+.transcript-header-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 24px;
+  margin-bottom: 18px;
+  flex-shrink: 0;
+}
+
+.record-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #1e40af;
+}
+
+.record-title-line {
+  flex: 1 1 auto;
+  height: 1px;
+  background-color: #e0f2fe;
+}
+
+/* 좌우 2컬럼 */
+.transcript-layout {
+  display: grid;
+  grid-template-columns: 1.1fr 1.1fr;
+  column-gap: 40px;
+  align-items: flex-start;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* 공통 라벨 */
+.section-label {
+  font-size: 14px;
+  color: #475569;
+  margin-bottom: 8px;
+  flex-shrink: 0;
+}
+
+/* ========== 왼쪽 : 전문 ========== */
+
+.transcript-left {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.assign-transcript-box {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  background-color: #fafeff;
+  border-radius: 10px;
+  border: 1px solid #e0f2fe;
+  padding: 10px 12px;
+  box-sizing: border-box;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.assign-transcript-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #000000;
+}
+
+/* 오른쪽 스크롤바 데코 */
+.assign-transcript-scrollbar {
+  width: 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #e0f2fe;
+}
+
+.assign-scroll-arrow {
+  width: 14px;
+  height: 14px;
+  border-radius: 2px;
+  border: 3px solid #60a5fa;
+  border-top-color: transparent;
+  border-left-color: transparent;
+}
+
+.assign-scroll-arrow-top {
+  margin-top: 8px;
+  transform: rotate(45deg);
+}
+
+.assign-scroll-arrow-bottom {
+  margin-top: auto;
+  margin-bottom: 8px;
+  transform: rotate(225deg);
+}
+
+.assign-scroll-track {
+  flex: 1 1 auto;
+  width: 19px;
+  background-color: #60a5fa;
+  margin: 8px 0;
+}
+
+/* 하단 텍스트 버튼들 */
+.assign-transcript-actions {
+  display: flex;
+  gap: 24px;
+  margin-top: 12px;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.text-link-button {
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  color: #475569;
+}
+
+.text-link-button:hover:not(.text-link-disabled) {
+  text-decoration: underline;
+}
+
+.text-link-disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* ========== 오른쪽 : 발화자 지정 + 미리보기 ========== */
+
+.transcript-right {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  padding-right: 32px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* 발화자 지정 영역 */
+.speaker-assign-block {
+  position: relative;
+  padding: 16px 40px 16px 0;
+  margin-bottom: 16px;
+  box-sizing: border-box;
+  margin-top: -12px;
+  flex-shrink: 0;
+}
+
+.speaker-assign-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 1.1fr;
+  column-gap: 28px;
+}
+
+.speaker-assign-column {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.speaker-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.speaker-label {
+  font-size: 14px;
+  color: #475569;
+}
+
+.speaker-select {
+  width: 100%;
+  height: 42px;
+  border-radius: 10px;
+  border: 1px solid #e0f2fe;
+  padding: 0 12px;
+  font-size: 14px;
+  color: #334155;
+  background-color: #ffffff;
+  outline: none;
+  box-sizing: border-box;
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, #60a5fa 50%),
+    linear-gradient(135deg, #60a5fa 50%, transparent 50%);
+  background-position: calc(100% - 16px) 50%, calc(100% - 11px) 50%;
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.04);
+  transition: all 0.2s ease;
+}
+
+.speaker-select:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.speaker-empty-text {
+  font-size: 13px;
+  color: #999999;
+  margin: 8px 0 0;
+  grid-column: 1 / -1;
+}
+
+/* 오른쪽 회색 기둥 데코 */
+.speaker-scroll-deco {
+  position: absolute;
+  top: 16px;                /* .speaker-assign-block padding-top 과 맞추기 */
+  right: 12px;              /* padding-right 40px 안쪽으로 약간 */
+  bottom: 0;                /* 아래쪽은 박스 바닥까지 */
+  width: 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #e0f2fe;
+}
+
+.speaker-scroll-inner {
+  width: 14px;
+  height: 100%;
+  background-color: #60a5fa;
+}
+
+.speaker-scroll-deco {
+  position: absolute;
+  top: 16px;
+  right: 0px;             /* 기존 right: 0; 에서 8px 정도 안쪽으로 */
+  width: 24px;
+  bottom: 16px;
+  height: calc(100% - 20px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 미리보기 영역 */
+.preview-header-row {
+  margin-bottom: 8px;
+  flex-shrink: 0;
+}
+
+.preview-box {
+  background-color: #ffffff;
+  border-radius: 10px;
+  border: 1px solid #e0f2fe;
+  padding: 12px 14px;
+  box-sizing: border-box;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.preview-scroll {
+  height: 100%;
+  overflow-y: auto;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #334155;
+}
+
+/* 저장 버튼
+.meeting-transcript-actions {
+  margin-top: 18px;
+  display: flex;
+  justify-content: flex-end;
+  flex-shrink: 0;
+} */
+
+.meeting-transcript-actions{
+  position: sticky;
+  bottom: 0;
+  background: #fff;      /* 뒤 컨텐츠가 비치면 */
+  padding-top: 12px;
+  padding-bottom: 12px;
+  z-index: 5;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-transcript-save {
+  min-width: 120px;
+  height: 40px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+  transition: all 0.2s ease;
+}
+
+.btn-transcript-save:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.3);
+}
+
+/* ========== 커스텀 스크롤바 ========== */
+.assign-transcript-scroll::-webkit-scrollbar,
+.preview-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.assign-transcript-scroll::-webkit-scrollbar-track,
+.preview-scroll::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 10px;
+}
+
+.assign-transcript-scroll::-webkit-scrollbar-thumb,
+.preview-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+  border-radius: 10px;
+}
+
+.assign-transcript-scroll::-webkit-scrollbar-thumb:hover,
+.preview-scroll::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+}
+

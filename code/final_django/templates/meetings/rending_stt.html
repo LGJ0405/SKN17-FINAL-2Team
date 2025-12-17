@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% load static %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/rendering.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="processing-page">
+
+  <!-- 좌측: 기존 레이아웃과 자연스럽게 이어지는 타이틀 영역 -->
+  <header class="processing-header">
+    <h1 class="processing-title">회의 내용을 분석하고 있어요</h1>
+    <p class="processing-subtitle">
+      말하는대로가 회의 음성을 듣고,
+          <strong>텍스트 전사  ·  발화 구간 인식 </strong>을 진행하고 있어요.
+        분석이 끝나면 다음 화면에서 화자를 매핑하실 수 있습니다.
+    </p>
+  </header>
+
+  <!-- 중앙 카드: 온보딩 슬라이드 느낌의 메인 영역 -->
+  <main class="processing-main">
+    <section class="processing-card">
+      <!-- 중앙 일러스트 영역 (배경 컬러 + 심플한 바 디자인) -->
+      <div class="processing-visual">
+        <div class="processing-visual-bar">
+          <div class="visual-dot visual-dot-left"></div>
+          <div class="visual-dot visual-dot-center"></div>
+          <div class="visual-dot visual-dot-right"></div>
+        </div>
+      </div>
+
+      <!-- 프로그레스 바 (무한 로딩 애니메이션) -->
+      <div class="processing-progress">
+        <div class="processing-progress-track">
+          <div class="processing-progress-bar"></div>
+        </div>
+        <p class="processing-progress-text">
+          말하는대로가 대화 기록을 분석해서 기록 품질을 높이고 있어요…
+        </p>
+      </div>
+    </section>
+  </main>
+
+</div>
+
+<script>
+  (function () {
+    const meetingId = "{{ meeting_id }}";
+
+    async function runSttAndRedirect() {
+      try {
+        // STT 실행 및 상태 확인
+        const res = await fetch(`/meetings/${meetingId}/transcript/prepare/`);
+        const data = await res.json();
+        console.log(data)
+        if (data.status === "done") {
+          // 모델 응답까지 모두 완료 → transcript 화면으로 이동
+          window.location.href = `/meetings/${meetingId}/transcript/`;
+        } else if (data.status === "error") {
+          alert(data.message || "전사 처리 중 오류가 발생했습니다.");
+          window.location.href = `/meetings/${meetingId}/record/`;
+        }
+      } catch (e) {
+        console.error(e);
+        alert("전사 상태를 확인하는 중 오류가 발생했습니다.");
+        window.location.href = `/meetings/${meetingId}/record/`;
+      }
+    }
+
+    // 페이지 로딩 직후 실행
+    runSttAndRedirect();
+  })();
+</script>
+{% endblock %}
+

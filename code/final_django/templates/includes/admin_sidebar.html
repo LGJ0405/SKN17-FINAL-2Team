@@ -1,0 +1,104 @@
+{% load static %}
+
+<nav class="sidebar" id="admin-sidebar">
+  <!-- 토글 버튼 -->
+  <button type="button" class="sidebar-toggle-btn" id="admin-sidebar-toggle">
+    <span class="sidebar-toggle-icon">‹</span>
+  </button>
+
+  <!-- 로고 영역 -->
+  <div class="sidebar-header">
+    <div class="sidebar-logo">
+      <img
+        src="{% static 'img/logo.png' %}"
+        alt="말하는대로"
+        class="sidebar-logo-image"
+      />
+      <img
+        src="{% static 'img/favicon.png' %}"
+        alt="로고 아이콘"
+        class="sidebar-logo-icon"
+      />
+    </div>
+    <!-- 접힘 상태 전용 회의 목록 바로가기 -->
+  </div>
+
+  <!-- 상단 메뉴 (홈) -->
+  <div class="sidebar-section">
+    <ul class="sidebar-menu">
+      <li class="sidebar-item {% if request.resolver_match.app_name == 'core' and request.resolver_match.url_name == 'home' %}sidebar-item-active{% endif %}">
+        <a href="{% url 'core:home' %}" class="sidebar-link">
+          <span class="sidebar-icon sidebar-icon-home" aria-hidden="true"></span>
+          <span class="sidebar-link-text">홈</span>
+        </a>
+      </li>
+      <li class="sidebar-item collapsed-only collapsed-search-item">
+        <button
+          type="button"
+          id="admin-sidebar-search-toggle"
+          class="sidebar-collapsed-action"
+          title="검색 열기"
+        >
+          <span class="sidebar-icon sidebar-icon-search" aria-hidden="true"></span>
+        </button>
+      </li>
+    </ul>
+  </div>
+
+  <!-- 사용자 검색 -->
+  <div class="sidebar-section">
+    <div class="admin-search-box">
+      <input
+        type="text"
+        id="admin-user-search"
+        class="admin-search-input"
+        placeholder="부서를 검색해주세요"
+        autocomplete="off"
+      />
+    </div>
+  </div>
+
+  <!-- 조직도 트리: 회사 + 부서까지만 -->
+  <div class="sidebar-section">
+    <div class="admin-tree">
+      <ul class="tree-root" id="admin-dept-tree">
+        <li>
+          <span class="tree-label root-label">주식회사 말하는대로</span>
+          <ul>
+            {% for dept in departments %}
+              <li>
+                <span
+                  class="tree-label tree-dept dept-item"
+                  data-dept-id="{{ dept.dept_id }}"
+                >
+                  {{ dept.dept_name }}
+                </span>
+              </li>
+            {% endfor %}
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 하단 링크 -->
+  <div class="sidebar-footer">
+    <ul class="sidebar-menu">
+      <li class="sidebar-item">
+        <a href="{% url 'core:admin_home' %}" class="sidebar-link sidebar-link-footer">
+          <span class="sidebar-link-text">관리자 홈</span>
+        </a>
+      </li>
+      <li class="sidebar-item">
+        <a href="{% url 'accounts:logout' %}" class="sidebar-link sidebar-link-footer">
+          <span class="sidebar-link-text">로그아웃</span>
+        </a>
+      </li>
+      <li class="sidebar-item">
+        <a href="#" id="modify-pw-link" class="sidebar-link sidebar-link-footer">
+          <span class="sidebar-link-text">비밀번호 변경</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>
