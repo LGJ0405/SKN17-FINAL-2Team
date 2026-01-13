@@ -8,9 +8,9 @@ from django.shortcuts import redirect
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 
-from apps.accounts.models import User
-from apps.google_calendar.models import GoogleCalendarToken, OAuthState
-from apps.google_calendar.utils import get_google_credentials
+from users.models import User
+from google_calendar.models import GoogleCalendarToken, OAuthState
+from google_calendar.utils import get_google_credentials
 
 from google_auth_oauthlib.flow import Flow
 from googleapiclient.discovery import build

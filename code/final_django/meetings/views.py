@@ -1,7 +1,7 @@
 ﻿from django.shortcuts import redirect, render
 from django.views.generic import TemplateView
-from apps.core.views import LoginRequiredSessionMixin
-from apps.accounts.models import Dept, User
+from core.views import LoginRequiredSessionMixin
+from users.models import Dept, User
 from django.db.models import Prefetch, Q
 
 from django.shortcuts import get_object_or_404
@@ -13,8 +13,8 @@ from django.contrib import messages
 from django.db import transaction
 
 
-from apps.meetings.utils.s3_upload import upload_raw_file_bytes
-from apps.meetings.utils.runpod import get_stt, get_sllm
+from meetings.utils.s3_upload import upload_raw_file_bytes, get_presigned_url
+from meetings.utils.runpod import get_stt, get_sllm
 
 from django.views.decorators.http import require_GET, require_POST
 from datetime import date, datetime, timedelta
@@ -78,24 +78,6 @@ def _resolve_s3_file(meeting: Meeting):
         return s3_obj
 
     return S3File.objects.filter(s3_key=record_url_val).first()
-
-
-def _generate_presigned_url(s3_key: str, expires_seconds: int = 60 * 60 * 48) -> str:
-    """
-    s3_key 기반으로 매번 새 presigned URL을 생성해 만료/시계 문제를 회피한다.
-    """
-    s3 = boto3.client(
-        "s3",
-        region_name=settings.AWS_S3_REGION_NAME,
-        endpoint_url=f"https://s3.{settings.AWS_S3_REGION_NAME}.amazonaws.com",
-        config=Config(signature_version="s3v4"),
-    )
-    return s3.generate_presigned_url(
-        "get_object",
-        Params={"Bucket": settings.AWS_STORAGE_BUCKET_NAME, "Key": s3_key},
-        ExpiresIn=expires_seconds,
-    )
-
 
 def _transcript_to_plain_text(raw_transcript: str) -> str:
     """
@@ -1281,7 +1263,7 @@ def meeting_audio_download(request, meeting_id):
         )
 
     try:
-        presigned_url = _generate_presigned_url(s3_obj.s3_key)
+        presigned_url = get_presigned_url(s3_obj.s3_key)
     except Exception:
         return JsonResponse(
             {"ok": False, "error": "음성 파일 URL을 생성하는 중 오류가 발생했습니다."},
@@ -1499,7 +1481,7 @@ def meeting_transcript_prepare(request, meeting_id):
                 status=404,
             )
         try:
-            presigned_url = _generate_presigned_url(s3_obj.s3_key)
+            presigned_url = get_presigned_url(s3_obj.s3_key)
         except Exception as e:
             return JsonResponse(
                 {
@@ -2035,6 +2017,38 @@ def minutes_download(request, meeting_id, fmt):
 
         font = KOREAN_FONT_NAME
 
+        def wrap_line_by_width(line: str, max_width: float, font_size: int = 10):
+            """
+            주어진 폭 안에 단어 단위로 줄바꿈. 너무 긴 단어는 폭에 맞게 강제 분리.
+            """
+            words = line.split()
+            if not words:
+                return [""]
+            lines_local = []
+            current = words[0]
+            for word in words[1:]:
+                candidate = f"{current} {word}"
+                if pdfmetrics.stringWidth(candidate, font, font_size) <= max_width:
+                    current = candidate
+                else:
+                    lines_local.append(current)
+                    current = word
+            if pdfmetrics.stringWidth(current, font, font_size) > max_width:
+                tmp = current
+                while pdfmetrics.stringWidth(tmp, font, font_size) > max_width:
+                    cut = len(tmp)
+                    while cut > 0 and pdfmetrics.stringWidth(tmp[:cut], font, font_size) > max_width:
+                        cut -= 1
+                    if cut <= 0:
+                        break
+                    lines_local.append(tmp[:cut])
+                    tmp = tmp[cut:]
+                if tmp:
+                    lines_local.append(tmp)
+            else:
+                lines_local.append(current)
+            return lines_local
+
         def draw_page_border(top_y, bottom_y):
             p.line(x_left, top_y, x_left, bottom_y)
             p.line(x_right, top_y, x_right, bottom_y)
@@ -2099,7 +2113,7 @@ def minutes_download(request, meeting_id, fmt):
                 return header_top - header_row_h * row_idx - header_row_h + 8
 
             y_row1 = header_text_y(0)
-            p.drawString(x_left + 5, y_row1, "안 건")
+            p.drawString(x_left + 5, y_row1, "제 목")
             p.drawString(x_left + 5 + 80, y_row1, agenda)
 
             y_row2 = header_text_y(1)
@@ -2118,8 +2132,12 @@ def minutes_download(request, meeting_id, fmt):
             y_row4 = header_text_y(3)
             p.drawString(x_left + 5, y_row4, "주요안건")
             if main_agenda:
-                short_agenda = (main_agenda[:50] + "…") if len(main_agenda) > 50 else main_agenda
-                p.drawString(x_left + 5 + 80, y_row4, short_agenda)
+                agenda_box_width = x_right - (x_left + 80) - 10
+                agenda_lines = wrap_line_by_width(main_agenda, agenda_box_width, font_size=11)
+                agenda_y = y_row4
+                for line in agenda_lines:
+                    p.drawString(x_left + 5 + 80, agenda_y, line)
+                    agenda_y -= line_height
 
             current_top = header_top - 4 * header_row_h
         else:
@@ -2168,40 +2186,6 @@ def minutes_download(request, meeting_id, fmt):
             todos_box_top = todos_box_bottom = None
 
         p.setFont(font, 10)
-
-        def wrap_line_by_width(line: str, max_width: float):
-            """
-            주어진 폭 안에 단어 단위로 줄바꿈.
-            너무 긴 단어는 폭에 맞게 잘라서라도 넣는다.
-            """
-            words = line.split()
-            if not words:
-                return [""]
-            lines = []
-            current = words[0]
-            for word in words[1:]:
-                candidate = f"{current} {word}"
-                if pdfmetrics.stringWidth(candidate, font, 10) <= max_width:
-                    current = candidate
-                else:
-                    lines.append(current)
-                    current = word
-            # 단일 단어가 너무 길다면 강제로 잘라 넣는다.
-            if pdfmetrics.stringWidth(current, font, 10) > max_width:
-                tmp = current
-                while pdfmetrics.stringWidth(tmp, font, 10) > max_width:
-                    cut = len(tmp)
-                    while cut > 0 and pdfmetrics.stringWidth(tmp[:cut], font, 10) > max_width:
-                        cut -= 1
-                    if cut <= 0:
-                        break
-                    lines.append(tmp[:cut])
-                    tmp = tmp[cut:]
-                if tmp:
-                    lines.append(tmp)
-            else:
-                lines.append(current)
-            return lines
 
         def draw_multiline_in_box(text, x_left_box, x_right_box, top_y, bottom_y):
             usable_width = (x_right_box - x_left_box) - 10  # 좌우 여백 5씩 확보
@@ -2333,7 +2317,7 @@ def minutes_download(request, meeting_id, fmt):
         doc.add_heading(meeting.title or "회의록", level=1)
 
         info_rows = [
-            ("안건", agenda or "-"),
+            ("제목", agenda or "-"),
             ("일시", meeting_dt_str or "-"),
             ("장소", place or "-"),
             ("주최자", host_name or "-"),

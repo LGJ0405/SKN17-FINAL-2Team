@@ -64,7 +64,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const formData = new FormData(form);
 
       try {
-        const res = await fetch("/accounts/login-api/", {
+        const res = await fetch("/users/login-api/", {
           method: "POST",
           headers: {
             "X-CSRFToken": csrftoken,

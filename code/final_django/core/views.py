@@ -8,11 +8,11 @@ from django.contrib.auth.hashers import make_password
 import json
 import re
 
-from apps.accounts.models import User, Dept
+from users.models import User, Dept
 from datetime import date, datetime, timedelta
 
 class LoginRequiredSessionMixin:
-    login_url = "/accounts/login/"
+    login_url = "/users/login/"
 
     @method_decorator(never_cache)
     def dispatch(self, request, *args, **kwargs):

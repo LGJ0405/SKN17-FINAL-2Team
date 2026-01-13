@@ -14,8 +14,15 @@ const recordingStatus = document.getElementById('recording-status');
 
 // ===== 전역 변수 =====
 let selectedFiles = []; // 드래그/선택된 파일을 저장해두는 배열
-let mediaRecorder = null;
-let audioChunks = [];
+let audioContext = null;
+let mediaStream = null;
+let sourceNode = null;
+let processorNode = null;
+let silentGainNode = null;
+let recordingBuffers = [];
+let recordingLength = 0;
+let recordingSampleRate = 44100;
+let isRecording = false;
 let recordingStartTime = 0;
 let timerInterval = null;
 let isPaused = false;
@@ -101,6 +108,108 @@ function handleFiles(fileList) {
 
 // Attach recording handlers only if recording UI exists to avoid JS errors
 if (btnRecord) {
+    function resetRecordingBuffers() {
+        recordingBuffers = [];
+        recordingLength = 0;
+    }
+
+    function mergeBuffers(buffers, length) {
+        const result = new Float32Array(length);
+        let offset = 0;
+        buffers.forEach((buffer) => {
+            result.set(buffer, offset);
+            offset += buffer.length;
+        });
+        return result;
+    }
+
+    function writeString(view, offset, string) {
+        for (let i = 0; i < string.length; i++) {
+            view.setUint8(offset + i, string.charCodeAt(i));
+        }
+    }
+
+    function floatTo16BitPCM(view, offset, input) {
+        for (let i = 0; i < input.length; i++, offset += 2) {
+            let s = Math.max(-1, Math.min(1, input[i]));
+            view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7fff, true);
+        }
+    }
+
+    function buildWavBlob(buffers, length, sampleRate) {
+        const data = mergeBuffers(buffers, length);
+        const buffer = new ArrayBuffer(44 + data.length * 2);
+        const view = new DataView(buffer);
+
+        writeString(view, 0, "RIFF");
+        view.setUint32(4, 36 + data.length * 2, true);
+        writeString(view, 8, "WAVE");
+        writeString(view, 12, "fmt ");
+        view.setUint32(16, 16, true);
+        view.setUint16(20, 1, true);
+        view.setUint16(22, 1, true);
+        view.setUint32(24, sampleRate, true);
+        view.setUint32(28, sampleRate * 2, true);
+        view.setUint16(32, 2, true);
+        view.setUint16(34, 16, true);
+        writeString(view, 36, "data");
+        view.setUint32(40, data.length * 2, true);
+        floatTo16BitPCM(view, 44, data);
+
+        return new Blob([view], { type: "audio/wav" });
+    }
+
+    function cleanupRecorder() {
+        if (processorNode) {
+            processorNode.disconnect();
+            processorNode.onaudioprocess = null;
+        }
+        if (sourceNode) {
+            sourceNode.disconnect();
+        }
+        if (silentGainNode) {
+            silentGainNode.disconnect();
+        }
+        if (audioContext) {
+            audioContext.close();
+        }
+        if (mediaStream) {
+            mediaStream.getTracks().forEach((track) => track.stop());
+        }
+        processorNode = null;
+        sourceNode = null;
+        silentGainNode = null;
+        audioContext = null;
+        mediaStream = null;
+    }
+
+    function finalizeRecording() {
+        if (recordingLength === 0) {
+            alert("녹음된 내용이 없습니다.");
+            return;
+        }
+        const audioBlob = buildWavBlob(
+            recordingBuffers,
+            recordingLength,
+            recordingSampleRate
+        );
+        const audioFile = new File([audioBlob], `recording_${Date.now()}.wav`, {
+            type: "audio/wav",
+        });
+
+        selectedFiles = [audioFile];
+        if (preview) preview.innerHTML = "";
+        const item = document.createElement("div");
+        item.textContent = `${audioFile.name} (${Math.round(
+            audioFile.size / 1024
+        )} KB) - 녹음 완료`;
+        if (preview) preview.appendChild(item);
+
+        if (recordingStatus) {
+            recordingStatus.textContent = "녹음이 완료되었습니다.";
+            recordingStatus.classList.remove("active");
+        }
+    }
     // 타이머 업데이트
     function updateTimer() {
         const elapsed = Date.now() - recordingStartTime - (pausedDuration || 0);
@@ -112,35 +221,31 @@ if (btnRecord) {
     // 녹음 시작
     btnRecord.addEventListener('click', async () => {
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            mediaRecorder = new MediaRecorder(stream);
-            audioChunks = [];
+            mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            recordingSampleRate = audioContext.sampleRate;
+            sourceNode = audioContext.createMediaStreamSource(mediaStream);
+            processorNode = audioContext.createScriptProcessor(4096, 1, 1);
+            silentGainNode = audioContext.createGain();
+            silentGainNode.gain.value = 0;
 
-            mediaRecorder.ondataavailable = (event) => {
-                audioChunks.push(event.data);
+            if (audioContext.state === 'suspended') {
+                await audioContext.resume();
+            }
+
+            resetRecordingBuffers();
+            isRecording = true;
+
+            processorNode.onaudioprocess = (event) => {
+                if (!isRecording || isPaused) return;
+                const inputData = event.inputBuffer.getChannelData(0);
+                recordingBuffers.push(new Float32Array(inputData));
+                recordingLength += inputData.length;
             };
 
-            mediaRecorder.onstop = () => {
-                const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-                const audioFile = new File([audioBlob], `recording_${Date.now()}.wav`, { type: 'audio/wav' });
-
-                selectedFiles = [audioFile];
-                if (preview) preview.innerHTML = '';
-                const item = document.createElement('div');
-                item.textContent = `${audioFile.name} (${Math.round(audioFile.size / 1024)} KB) - 녹음 완료`;
-                if (preview) preview.appendChild(item);
-
-                // 상태 메시지
-                if (recordingStatus) {
-                    recordingStatus.textContent = '녹음이 완료되었습니다.';
-                    recordingStatus.classList.remove('active');
-                }
-
-                // 스트림 종료
-                stream.getTracks().forEach(track => track.stop());
-            };
-
-            mediaRecorder.start();
+            sourceNode.connect(processorNode);
+            processorNode.connect(silentGainNode);
+            silentGainNode.connect(audioContext.destination);
             recordingStartTime = Date.now();
             // 초기화
             pausedDuration = 0;
@@ -170,9 +275,11 @@ if (btnRecord) {
     // 일시정지/재개
     if (btnPause) {
         btnPause.addEventListener('click', () => {
-            if (mediaRecorder && mediaRecorder.state === 'recording') {
+            if (isRecording && !isPaused) {
                 // pause: stop timer and record pause start
-                mediaRecorder.pause();
+                if (audioContext && audioContext.state === 'running') {
+                    audioContext.suspend();
+                }
                 clearInterval(timerInterval);
                 pauseStartTime = Date.now();
                 if (recordingStatus) recordingStatus.textContent = '일시정지됨';
@@ -182,9 +289,11 @@ if (btnRecord) {
                     btnRecord.classList.add('paused');
                 }
                 isPaused = true;
-            } else if (mediaRecorder && mediaRecorder.state === 'paused') {
+            } else if (isRecording && isPaused) {
                 // resume: accumulate paused duration and restart timer
-                mediaRecorder.resume();
+                if (audioContext && audioContext.state === 'suspended') {
+                    audioContext.resume();
+                }
                 if (pauseStartTime) {
                     pausedDuration += Date.now() - pauseStartTime;
                     pauseStartTime = 0;
@@ -205,9 +314,15 @@ if (btnRecord) {
     // 녹음 중지
     if (btnStop) {
         btnStop.addEventListener('click', () => {
-            if (mediaRecorder && (mediaRecorder.state === 'recording' || mediaRecorder.state === 'paused')) {
-                mediaRecorder.stop();
+            if (isRecording) {
+                isRecording = false;
                 clearInterval(timerInterval);
+                if (audioContext && audioContext.state === 'suspended') {
+                    audioContext.resume();
+                }
+                finalizeRecording();
+                cleanupRecorder();
+                isPaused = false;
 
                 // UI 초기화
                 btnRecord.disabled = false;
@@ -221,7 +336,7 @@ if (btnRecord) {
 
     // 페이지 이탈 경고: 녹음 중이거나 업로드되지 않은 파일이 있으면 경고
     window.addEventListener('beforeunload', function (e) {
-        const recordingActive = mediaRecorder && (mediaRecorder.state === 'recording' || mediaRecorder.state === 'paused');
+        const recordingActive = isRecording || isPaused;
         const hasUnsaved = selectedFiles && selectedFiles.length > 0;
         if (recordingActive || hasUnsaved) {
             e.preventDefault();

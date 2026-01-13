@@ -8,8 +8,8 @@ GOOGLE_OAUTH2_SCOPES = [
     "https://www.googleapis.com/auth/calendar",
     "https://www.googleapis.com/auth/tasks",
 ]
-# GOOGLE_OAUTH2_REDIRECT_URI = "http://localhost:8000/oauth2callback/"
-GOOGLE_OAUTH2_REDIRECT_URI = "https://malhaneundaero.com/oauth2callback/"
+GOOGLE_OAUTH2_REDIRECT_URI = "http://localhost:8000/oauth2callback/"
+# GOOGLE_OAUTH2_REDIRECT_URI = "https://malhaneundaero.com/oauth2callback/"
 
 load_dotenv(os.path.join(BASE_DIR, '.env'))
 
@@ -47,11 +47,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     
     'storages',
-    "apps.core",
-    "apps.accounts",
-    "apps.meetings",
+    "core",
+    "users",
+    "meetings",
 
-    'apps.google_calendar',
+    'google_calendar',
 ]
 
 MIDDLEWARE = [
@@ -77,7 +77,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                "apps.meetings.views.today_meetings",
+                "meetings.views.today_meetings",
             ],
         },
     },
@@ -85,26 +85,26 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'final_django.wsgi.application'
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'proddb',          # 실제 DB 이름으로 수정
-        'USER': 'admin',           # 실제 유저명으로 수정
-        'PASSWORD': os.getenv('DATABASES_PASSWORD'),
-        'HOST': os.getenv('DATABASES_HOST'),
-        'PORT': '3306',
-        'OPTIONS': {
-            'sql_mode': 'STRICT_TRANS_TABLES',
-            'charset': 'utf8mb4',
-        },
-    },
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
 }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'proddb',          # 실제 DB 이름으로 수정
+#         'USER': 'admin',           # 실제 유저명으로 수정
+#         'PASSWORD': os.getenv('DATABASES_PASSWORD'),
+#         'HOST': os.getenv('DATABASES_HOST'),
+#         'PORT': '3306',
+#         'OPTIONS': {
+#             'sql_mode': 'STRICT_TRANS_TABLES',
+#             'charset': 'utf8mb4',
+#         },
+#     },
+# }
 
 AUTH_PASSWORD_VALIDATORS = [
     {

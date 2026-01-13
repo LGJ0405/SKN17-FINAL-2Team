@@ -33,7 +33,7 @@
         <!-- 비밀번호 변경 모달 -->
         <div id="pw-modal" class="modal-overlay hidden">
         <div class="modal-box pw-modal-box">
-            <form id="pw-form" method="POST" action="{% url 'accounts:modify_pw' %}">
+            <form id="pw-form" method="POST" action="{% url 'users:modify_pw' %}">
             {% csrf_token %}
 
             <!-- 제목 -->
@@ -50,7 +50,7 @@
                     name="old_password"
                     class="pw-input"
                     placeholder="기존 비밀번호를 입력해 주세요"
-                    data-check-url="{% url 'accounts:check_old_pw' %}"
+                    data-check-url="{% url 'users:check_old_pw' %}"
                     />
                     <!-- 파란 성공 메세지 -->
                     <span id="current_pw_ok" class="pw-info-text">비밀번호가 일치합니다.</span>

@@ -120,7 +120,7 @@ def login_api(request):
 def logout_view(request):
     # Django auth + 직접 넣은 세션 모두 정리
     request.session.flush()
-    return redirect("accounts:login")
+    return redirect("users:login")
 
 @require_POST
 def check_old_pw(request):

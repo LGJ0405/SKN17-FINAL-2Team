@@ -9,7 +9,7 @@ from .views import (
     admin_reset_password,
 )
 
-app_name = "accounts"
+app_name = "users"
 
 urlpatterns = [
     path("login/", login_view, name="login"),

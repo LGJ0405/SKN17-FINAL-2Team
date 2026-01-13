@@ -55,7 +55,7 @@
     <!-- 초기 비밀번호 변경 모달 -->
     <div id="init-pw-modal" class="modal-overlay hidden">
       <div class="modal-box pw-modal-box">
-        <form id="init-pw-form" method="POST" action="{% url 'accounts:modify_pw_initial' %}">
+        <form id="init-pw-form" method="POST" action="{% url 'users:modify_pw_initial' %}">
           {% csrf_token %}
           <h2 class="pw-title">초기 비밀번호 변경</h2>
 

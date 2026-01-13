@@ -587,6 +587,9 @@
 }
 
 .detail-minutes-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-width: 110px;
   height: 32px;
   border-radius: 8px;
@@ -595,6 +598,7 @@
   font-size: 13px;
   color: #475569;
   cursor: pointer;
+  text-decoration: none;
 }
 
 .detail-minutes-btn:hover {

@@ -1,7 +1,7 @@
 import json
 from google.oauth2.credentials import Credentials
 from django.conf import settings
-from apps.google_calendar.models import GoogleCalendarToken
+from google_calendar.models import GoogleCalendarToken
 
 
 def get_google_credentials(request):

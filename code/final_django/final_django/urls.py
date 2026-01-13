@@ -26,9 +26,9 @@ urlpatterns = [
 
     path('django_admin/', admin.site.urls),
     
-    path("", include("apps.core.urls")),
-    path("accounts/", include("apps.accounts.urls")),
-    path("meetings/", include("apps.meetings.urls")),
+    path("", include("core.urls")),
+    path("users/", include("users.urls")),
+    path("meetings/", include("meetings.urls")),
 
-    path("", include("apps.google_calendar.urls")),    
+    path("", include("google_calendar.urls")),    
 ]

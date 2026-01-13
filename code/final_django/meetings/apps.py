@@ -4,7 +4,7 @@ import os, time
 
 class MeetingsConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'apps.meetings'
+    name = 'meetings'
 
     def ready(self):
         if os.environ.get("RUN_MAIN") != "true":
