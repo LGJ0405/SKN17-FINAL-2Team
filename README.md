@@ -68,7 +68,7 @@
 ---
 
 ## 데이터베이스 구조 (ERD)
-![ERD](images/erd2.png)
+![ERD](images/erd_ver3.png)
 
 ---
 
