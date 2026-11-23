@@ -44,23 +44,24 @@ def clear_cuda_cache():
     if torch.cuda.is_available():
         torch.cuda.empty_cache()
 
-def run_stt_diarization(audio_url, DEBUG=False):
-    if not DEBUG:
-        try:
-            print('파일 다운로드 중')
-            resp = requests.get(audio_url)
-            if resp.status_code != 200:
-                print("==== ERROR BODY ====")
-                print(resp.text)
-                return {"success": False, "message": f"Download failed ({resp.status_code})"}
-            audio_bytes = resp.content
-            print('파일 다운로드 완료')
-        except Exception as e:
-            return {"success": False, "error": {"type": "DownloadError", "message": str(e)}}
+def run_stt_diarization(audio_url=None, DEBUG=False, audio_bytes=None):
+    if audio_bytes is None:
+        if not DEBUG:
+            try:
+                print('파일 다운로드 중')
+                resp = requests.get(audio_url)
+                if resp.status_code != 200:
+                    print("==== ERROR BODY ====")
+                    print(resp.text)
+                    return {"success": False, "message": f"Download failed ({resp.status_code})"}
+                audio_bytes = resp.content
+                print('파일 다운로드 완료')
+            except Exception as e:
+                return {"success": False, "error": {"type": "DownloadError", "message": str(e)}}
 
-    else:
-        with open(audio_url, "rb") as f:
-            audio_bytes = f.read()
+        else:
+            with open(audio_url, "rb") as f:
+                audio_bytes = f.read()
     tmp_path = None
     
     try:

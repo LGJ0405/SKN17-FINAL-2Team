@@ -1,7 +1,7 @@
 import os
 import time
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
@@ -90,6 +90,15 @@ async def stt_async(req: AudioRequest):
     if not req.audio_url:
         raise HTTPException(status_code=422, detail="audio_url required")
     job_id = job_manager.submit("stt", _mock_stt, req.audio_url)
+    return {"success": True, "job_id": job_id, "status": "queued"}
+
+
+@app.post("/stt/async-file")
+async def stt_async_file(request: Request):
+    audio_bytes = await request.body()
+    if not audio_bytes:
+        raise HTTPException(status_code=422, detail="audio body required")
+    job_id = job_manager.submit("stt", _mock_stt, f"uploaded-bytes:{len(audio_bytes)}")
     return {"success": True, "job_id": job_id, "status": "queued"}
 
 

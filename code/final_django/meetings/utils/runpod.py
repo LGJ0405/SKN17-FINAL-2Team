@@ -4,6 +4,7 @@ import requests
 from django.conf import settings
 
 ASYNC_REQUEST_TIMEOUT = 15
+UPLOAD_REQUEST_TIMEOUT = 120
 
 
 def _base_url() -> str:
@@ -54,6 +55,15 @@ def start_stt_job(presigned_url):
         "stt/async",
         {"audio_url": presigned_url},
         timeout=ASYNC_REQUEST_TIMEOUT,
+    )
+
+
+def start_stt_job_from_bytes(audio_bytes: bytes):
+    return requests.post(
+        _base_url() + "stt/async-file",
+        data=audio_bytes,
+        headers={"Content-Type": "application/octet-stream"},
+        timeout=UPLOAD_REQUEST_TIMEOUT,
     )
 
 

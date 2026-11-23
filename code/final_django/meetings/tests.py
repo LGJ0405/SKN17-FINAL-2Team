@@ -301,3 +301,57 @@ class ServicesUnitTests(TestCase):
             os.environ.pop("RUNPOD_BASE_URL", None)
             with override_settings(POD_ID="testpod123", RUNPOD_BASE_URL=None):
                 self.assertEqual(runpod._base_url(), "https://testpod123-8000.proxy.runpod.net/")
+
+    @patch("meetings.views.get_job_status")
+    @patch("meetings.views.start_stt_job_from_bytes")
+    def test_local_storage_upload_and_bytes_polling(self, mock_start_bytes, mock_get_status):
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        from meetings.utils.s3_upload import get_local_audio_path, upload_raw_file_bytes
+
+        local_path = None
+        try:
+            with patch.dict(os.environ, {"USE_LOCAL_STORAGE": "true"}):
+                local_key = upload_raw_file_bytes(b"RIFF....WAVEfmt ", "local_test.wav", 3600)
+                self.assertTrue(local_key.startswith("local/"))
+                local_path = get_local_audio_path(local_key)
+                self.assertTrue(local_path.exists())
+
+                local_s3 = S3File.objects.get(s3_key=local_key)
+                meeting = Meeting.objects.create(
+                    host=self.host,
+                    title="로컬 저장 테스트 회의",
+                    meet_date_time=datetime(2026, 11, 24, 2, 0, 0),
+                    place="로컬",
+                    record_url=local_s3,
+                    domain="IT",
+                )
+
+                start_res = MagicMock()
+                start_res.status_code = 200
+                start_res.json.return_value = {"success": True, "job_id": "local-stt-1", "status": "queued"}
+                start_res.text = "{}"
+                mock_start_bytes.return_value = start_res
+
+                res1 = self.client.get(f"/meetings/{meeting.meeting_id}/transcript/prepare/")
+                self.assertEqual(res1.status_code, 200)
+                self.assertEqual(res1.json(), {"status": "processing", "job_id": "local-stt-1"})
+                mock_start_bytes.assert_called_once_with(b"RIFF....WAVEfmt ")
+
+                done_res = MagicMock()
+                done_res.status_code = 200
+                done_res.json.return_value = {
+                    "success": True,
+                    "job_id": "local-stt-1",
+                    "status": "done",
+                    "result": {"success": True, "data": {"full_text": [{"SPEAKER_00": "로컬 테스트 완료"}]}},
+                    "error": None,
+                }
+                done_res.text = "{}"
+                mock_get_status.return_value = done_res
+
+                res2 = self.client.get(f"/meetings/{meeting.meeting_id}/transcript/prepare/?job_id=local-stt-1")
+                self.assertEqual(res2.status_code, 200)
+                self.assertEqual(res2.json(), {"status": "done"})
+        finally:
+            if local_path and local_path.exists():
+                local_path.unlink()

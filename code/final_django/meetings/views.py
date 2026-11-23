@@ -7,7 +7,7 @@ import requests
 from django.contrib import messages
 from django.db import transaction
 from django.db.models import Prefetch, Q
-from django.http import Http404, HttpResponse, JsonResponse, StreamingHttpResponse
+from django.http import FileResponse, Http404, HttpResponse, JsonResponse, StreamingHttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
@@ -47,8 +47,14 @@ from meetings.utils.runpod import (
     get_stt,
     start_sllm_job,
     start_stt_job,
+    start_stt_job_from_bytes,
 )
-from meetings.utils.s3_upload import get_presigned_url, upload_raw_file_bytes
+from meetings.utils.s3_upload import (
+    get_local_audio_path,
+    get_presigned_url,
+    is_local_storage_key,
+    upload_raw_file_bytes,
+)
 from users.models import Dept, User
 
 from .models import Attendee, Meeting, S3File, Task
@@ -515,6 +521,16 @@ def meeting_audio_download(request, meeting_id):
     if not s3_obj:
         return JsonResponse({"ok": False, "error": "등록된 음성 파일이 없습니다."}, status=404)
 
+    if is_local_storage_key(s3_obj.s3_key):
+        try:
+            local_path = get_local_audio_path(s3_obj.s3_key)
+        except ValueError:
+            return JsonResponse({"ok": False, "error": "등록된 음성 파일이 없습니다."}, status=404)
+        if not local_path.exists():
+            return JsonResponse({"ok": False, "error": "등록된 음성 파일이 없습니다."}, status=404)
+        filename = getattr(s3_obj, "original_name", None) or f"meeting_{meeting_id}.wav"
+        return FileResponse(open(local_path, "rb"), as_attachment=True, filename=filename, content_type="audio/wav")
+
     try:
         presigned_url = get_presigned_url(s3_obj.s3_key)
     except Exception:
@@ -670,17 +686,32 @@ def meeting_transcript_prepare(request, meeting_id):
         s3_obj = _resolve_s3_file(meeting)
         if not s3_obj:
             return JsonResponse({"status": "error", "message": "등록된 음성 파일이 없습니다."}, status=404)
-        try:
-            presigned_url = get_presigned_url(s3_obj.s3_key)
-        except Exception as e:
-            return JsonResponse(
-                {"status": "error", "message": f"음성 URL 생성 중 오류가 발생했습니다: {e}"},
-                status=500,
-            )
 
-        print(f"[STT] meeting_id={meeting_id} s3_key={s3_obj.s3_key} presigned_url_generated")
+        if is_local_storage_key(s3_obj.s3_key):
+            try:
+                local_path = get_local_audio_path(s3_obj.s3_key)
+                audio_bytes = local_path.read_bytes()
+            except Exception as e:
+                return JsonResponse(
+                    {"status": "error", "message": f"로컬 음성 파일을 읽는 중 오류가 발생했습니다: {e}"},
+                    status=500,
+                )
+            print(f"[STT] meeting_id={meeting_id} local_key={s3_obj.s3_key} bytes={len(audio_bytes)}")
+            start_fn = lambda: start_stt_job_from_bytes(audio_bytes)
+        else:
+            try:
+                presigned_url = get_presigned_url(s3_obj.s3_key)
+            except Exception as e:
+                return JsonResponse(
+                    {"status": "error", "message": f"음성 URL 생성 중 오류가 발생했습니다: {e}"},
+                    status=500,
+                )
+
+            print(f"[STT] meeting_id={meeting_id} s3_key={s3_obj.s3_key} presigned_url_generated")
+            start_fn = lambda: start_stt_job(presigned_url)
+
         new_job_id, err_res = start_runpod_job(
-            lambda: start_stt_job(presigned_url),
+            start_fn,
             comm_error_prefix="STT 작업 시작 중 통신 오류가 발생했습니다",
             start_error_msg="전사 작업을 시작하지 못했습니다.",
         )

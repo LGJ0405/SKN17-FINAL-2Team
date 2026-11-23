@@ -26,3 +26,6 @@ venv
 
 # Django collectstatic 결과물 무시
 staticfiles/
+
+# 로컬 음성 저장소 무시
+media/local/
