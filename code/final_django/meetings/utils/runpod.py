@@ -1,36 +1,69 @@
+import os
+
 import requests
 from django.conf import settings
 
+ASYNC_REQUEST_TIMEOUT = 15
 
-url = f"https://{settings.POD_ID}-8000.proxy.runpod.net/"
+
+def _base_url() -> str:
+    override = os.getenv("RUNPOD_BASE_URL") or getattr(settings, "RUNPOD_BASE_URL", None)
+    if override:
+        return override.rstrip("/") + "/"
+    return f"https://{settings.POD_ID}-8000.proxy.runpod.net/"
+
+
+def _normalize_domain(domain):
+    if isinstance(domain, (list, tuple)):
+        return list(domain)
+    if domain:
+        return [domain]
+    return []
+
+
+def _get(path: str, timeout=None):
+    kwargs = {"timeout": timeout} if timeout is not None else {}
+    return requests.get(_base_url() + path, **kwargs)
+
+
+def _post(path: str, payload: dict, timeout=None):
+    kwargs = {"timeout": timeout} if timeout is not None else {}
+    return requests.post(_base_url() + path, json=payload, **kwargs)
+
 
 def runpod_health():
-    res = requests.get(url + "health") 
-    return res.status_code
+    return _get("health", timeout=ASYNC_REQUEST_TIMEOUT).status_code
+
 
 def get_stt(presigned_url):
-    res = requests.post(
-        url + "stt",
-        json={'audio_url': presigned_url}
-    )
-    return res
+    return _post("stt", {"audio_url": presigned_url})
+
 
 def get_sllm(transcript, domain=""):
     """
     domain: string or list of strings. Normalized to list for API.
     """
-    if isinstance(domain, (list, tuple)):
-        domain_payload = list(domain)
-    elif domain:
-        domain_payload = [domain]
-    else:
-        domain_payload = []
-
-    res = requests.post(
-        url + "inference",
-        json={
-            'transcript': transcript,
-            'domain': domain_payload
-        }
+    return _post(
+        "inference",
+        {"transcript": transcript, "domain": _normalize_domain(domain)},
     )
-    return res
+
+
+def start_stt_job(presigned_url):
+    return _post(
+        "stt/async",
+        {"audio_url": presigned_url},
+        timeout=ASYNC_REQUEST_TIMEOUT,
+    )
+
+
+def start_sllm_job(transcript, domain=""):
+    return _post(
+        "inference/async",
+        {"transcript": transcript, "domain": _normalize_domain(domain)},
+        timeout=ASYNC_REQUEST_TIMEOUT,
+    )
+
+
+def get_job_status(job_id):
+    return _get(f"jobs/{job_id}", timeout=ASYNC_REQUEST_TIMEOUT)

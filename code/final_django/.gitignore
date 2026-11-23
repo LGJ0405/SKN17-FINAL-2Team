@@ -23,3 +23,6 @@ client_secret.json
 
 # 기타
 venv
+
+# Django collectstatic 결과물 무시
+staticfiles/

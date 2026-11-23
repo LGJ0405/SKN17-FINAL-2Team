@@ -43,32 +43,18 @@
 
 </div>
 
+<script src="{% static 'js/meetings/job_poller.js' %}"></script>
 <script>
   (function () {
     const meetingId = "{{ meeting_id }}";
-
-    async function runSttAndRedirect() {
-      try {
-        // STT 실행 및 상태 확인
-        const res = await fetch(`/meetings/${meetingId}/transcript/prepare/`);
-        const data = await res.json();
-        console.log(data)
-        if (data.status === "done") {
-          // 모델 응답까지 모두 완료 → transcript 화면으로 이동
-          window.location.href = `/meetings/${meetingId}/transcript/`;
-        } else if (data.status === "error") {
-          alert(data.message || "전사 처리 중 오류가 발생했습니다.");
-          window.location.href = `/meetings/${meetingId}/record/`;
-        }
-      } catch (e) {
-        console.error(e);
-        alert("전사 상태를 확인하는 중 오류가 발생했습니다.");
-        window.location.href = `/meetings/${meetingId}/record/`;
-      }
-    }
-
-    // 페이지 로딩 직후 실행
-    runSttAndRedirect();
+    window.startJobPolling({
+      storageKey: `stt_job_${meetingId}`,
+      prepareUrl: `/meetings/${meetingId}/transcript/prepare/`,
+      successUrl: `/meetings/${meetingId}/transcript/`,
+      failUrl: `/meetings/${meetingId}/record/`,
+      defaultErrorMessage: "전사 처리 중 오류가 발생했습니다.",
+      networkErrorMessage: "전사 상태를 확인하는 중 오류가 발생했습니다.",
+    });
   })();
 </script>
 {% endblock %}

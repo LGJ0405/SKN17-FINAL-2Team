@@ -18,3 +18,7 @@ __pycache__/
 **/*.sqlite3
 
 .DS_Store
+
+# Django collectstatic 결과물 무시
+staticfiles/
+**/staticfiles/
