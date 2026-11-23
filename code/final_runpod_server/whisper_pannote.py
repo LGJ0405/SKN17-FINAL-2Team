@@ -69,11 +69,13 @@ def run_stt_diarization(audio_url=None, DEBUG=False, audio_bytes=None):
             tmp.write(audio_bytes)
             tmp_path = tmp.name
         start = time.perf_counter()
-        # Use globally loaded models
+        # Use globally loaded models (torchcodec AudioDecoder 의존성 우회를 위해 waveform 직접 전달)
         print('위스퍼 + 파이아노트 병렬 실행 중')
+        audio_np = whisper.load_audio(tmp_path)
+        waveform = torch.from_numpy(audio_np).unsqueeze(0)
         with concurrent.futures.ThreadPoolExecutor() as executor:
-            whisper_future = executor.submit(whisper_model.transcribe, tmp_path, language="ko")
-            diarization_future = executor.submit(pipeline, tmp_path)
+            whisper_future = executor.submit(whisper_model.transcribe, audio_np, language="ko")
+            diarization_future = executor.submit(pipeline, {"waveform": waveform, "sample_rate": 16000})
 
             whisper_result = whisper_future.result()
             diarization_result = diarization_future.result()
