@@ -486,38 +486,48 @@ def agent_main(domain_input, transcript):
     else:
         domain_filter = domain_input if domain_input else None
 
-    # Retrieval Tool 등록
+    # Retrieval Tool 등록 (FAISS DB가 없으면 RAG 단계 생략)
     print("\n" + "=" * 50)
     print("Retrieval Tool 등록 중...")
     print("=" * 50)
 
-    retrieval_func = create_retrieval_tool(DB_PATH, domain_filter=domain_filter)
-    agent.register_tool(
-        name="retrieval",
-        description="회의록 전문에서 의미가 모호한 도메인 특화 단어를 검색하는 도구입니다.",
-        parameters={
-            "type": "object",
-            "properties": {
-                "term_list": {
-                    "type": "array",
-                    "items": {"type": "string"},
-                    "description": "검색할 도메인 용어 리스트"
+    db_dir = Path(DB_PATH)
+    if not (db_dir / "index.faiss").exists():
+        fallback_dir = Path(__file__).parent / "faiss_db_merged"
+        if (fallback_dir / "index.faiss").exists():
+            db_dir = fallback_dir
+
+    use_retrieval = (db_dir / "index.faiss").exists()
+    if use_retrieval:
+        retrieval_func = create_retrieval_tool(str(db_dir), domain_filter=domain_filter)
+        agent.register_tool(
+            name="retrieval",
+            description="회의록 전문에서 의미가 모호한 도메인 특화 단어를 검색하는 도구입니다.",
+            parameters={
+                "type": "object",
+                "properties": {
+                    "term_list": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": "검색할 도메인 용어 리스트"
+                    },
+                    "k": {
+                        "type": "integer",
+                        "description": "각 용어당 검색할 결과 개수",
+                        "default": 1
+                    },
+                    "domain": {
+                        "type": "string",
+                        "description": "검색할 도메인 (예: IT, 의료, 법률)",
+                        "default": domain_filter
+                    }
                 },
-                "k": {
-                    "type": "integer",
-                    "description": "각 용어당 검색할 결과 개수",
-                    "default": 1
-                },
-                "domain": {
-                    "type": "string",
-                    "description": "검색할 도메인 (예: IT, 의료, 법률)",
-                    "default": domain_filter
-                }
+                "required": ["term_list"]
             },
-            "required": ["term_list"]
-        },
-        function=retrieval_func
-    )
+            function=retrieval_func
+        )
+    else:
+        print(f"⚠️ FAISS DB({db_dir / 'index.faiss'})를 찾을 수 없어 Retrieval Tool을 생략하고 바로 요약/태스크를 추출합니다.")
 
     print("\n" + "=" * 50)
     print("회의록 처리 파이프라인 시작")
@@ -527,7 +537,7 @@ def agent_main(domain_input, transcript):
         transcript=transcript,
         agent=agent,
         current_date=None,
-        use_retrieval=True,  # 전문 이해 시 retrieval tool 사용
+        use_retrieval=use_retrieval,
         domain=domain_filter
     )
     return result
