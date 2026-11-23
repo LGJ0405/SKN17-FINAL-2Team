@@ -478,8 +478,13 @@ def agent_main(domain_input, transcript):
         adapter_id=FT_MODEL_NAME
     )
 
-    # 도메인 입력
-    domain_filter = domain_input if domain_input else None
+    # 도메인 입력 (리스트/튜플로 전달되더라도 첫 번째 유효 문자열로 정규화)
+    if isinstance(domain_input, (list, tuple)):
+        domain_filter = next((str(d).strip() for d in domain_input if str(d).strip()), None)
+    elif isinstance(domain_input, str):
+        domain_filter = domain_input.strip() or None
+    else:
+        domain_filter = domain_input if domain_input else None
 
     # Retrieval Tool 등록
     print("\n" + "=" * 50)
