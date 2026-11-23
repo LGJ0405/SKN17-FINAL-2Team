@@ -45,12 +45,20 @@
 
 ## 프로젝트 구조
 - **final_django/**: 프로젝트의 메인 설정 파일(settings, urls 등)이 위치합니다.
-- **core/**: 다른 앱들에서 공통적으로 사용되는 핵심 기능 또는 모듈을 포함합니다.
+- **core/**: 다른 앱들에서 공통적으로 사용되는 핵심 기능 및 관리자 멤버 API를 포함합니다.
 - **users/**: 회원가입, 로그인 등 유저 인증 및 회원 관리를 담당합니다.
 - **meetings/**: 회의 생성, 녹음, STT/SLLM 요청, 요약 등 프로젝트의 핵심 기능을 담당합니다.
+  - **meetings/services/**: 비즈니스 로직 분리 모듈 (`transcript.py`, `permissions.py`, `export.py`, `runpod_polling.py`)
+  - **meetings/utils/**: 외부 연동 유틸리티 (`runpod.py`, `s3_upload.py`)
 - **google_calendar/**: 구글 캘린더 API 연동 및 관련 기능을 담당합니다.
-- **static/**: CSS, JavaScript, 이미지 등 정적 파일을 관리합니다.
+- **static/**: CSS, JavaScript(`static/js/meetings/job_poller.js` 등), 이미지 등 정적 파일을 관리합니다.
 - **templates/**: HTML 템플릿 파일이 위치합니다.
+
+## 비동기 폴링 구조
+1분 이상 걸리는 STT/SLLM 추론 시 프록시 타임아웃으로 연결이 끊어지는 문제를 해결하기 위해 브라우저 ↔ Django ↔ RunPod 전 구간이 폴링 방식으로 동작합니다.
+1. 대기 화면(`rending_stt.html`, `rending_sllm.html`)에서 `static/js/meetings/job_poller.js`의 `startJobPolling()`을 호출합니다.
+2. `job_id`가 없는 최초 요청 시 Django(`/transcript/prepare/`, `/sllm/prepare/`)가 RunPod 비동기 작업을 시작하고 `job_id`를 반환합니다.
+3. 프론트엔드는 `sessionStorage`에 `job_id`를 저장한 뒤 3초 간격으로 `?job_id=...` 폴링을 수행하며, 완료(`done`) 시 Django가 결과를 DB에 저장하고 다음 페이지로 이동합니다.
 
 ## Gunicorn 설정 (`gunicorn.conf.py`)
 `gunicorn.conf.py` 파일은 Gunicorn WSGI 서버의 실행 설정을 담고 있습니다. 주요 설정은 다음과 같습니다.
@@ -86,6 +94,10 @@ AWS_S3_REGION_NAME=ap-northeast-2
 
 # Model Server (RunPod)
 POD_ID=<모델이 올라간 런팟의 팟 ID>
+
+# 선택: 로컬 테스트/우회 옵션
+# USE_LOCAL_STORAGE=true           # S3 미사용 시 media/local/에 저장 후 RunPod /stt/async-file로 직접 전송
+# RUNPOD_BASE_URL=http://127.0.0.1:8001/  # RunPod 팟 대신 로컬 Mock 서버(mock_server.py) 사용 시
 ```
 
 # 로컬 개발 환경 설정
@@ -116,6 +128,10 @@ DATABASES_HOST=localhost
 
 # Model Server (RunPod)
 POD_ID=<모델이 올라간 런팟의 팟 ID>
+
+# 선택: 로컬 테스트/우회 옵션
+# USE_LOCAL_STORAGE=true           # S3 미사용 시 media/local/에 저장 후 RunPod /stt/async-file로 직접 전송
+# RUNPOD_BASE_URL=http://127.0.0.1:8001/  # RunPod 팟 대신 로컬 Mock 서버(mock_server.py) 사용 시
 ```
 ## 5. 데이터베이스 마이그레이션
 ```bash
@@ -183,8 +199,10 @@ scp -i <pem키 경로> <.env 경로> ubuntu@[EC2 IP]:/home/ubuntu/final_django
 ```bash
 vim final_django/settings.py
 ```
-## 11. Docker 빌드 및  실행
+## 11. 정적 파일 수집 및 Docker 빌드/실행
+`CompressedManifestStaticFilesStorage`를 사용하므로 정적 파일(`static/`)이 변경된 경우 `collectstatic`을 실행합니다. (`staticfiles/`는 `.gitignore`로 제외됩니다.)
 ```bash
+python manage.py collectstatic --noinput
 docker compose build --no-cache
 docker compose up -d
 ```

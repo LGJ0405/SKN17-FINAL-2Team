@@ -31,12 +31,24 @@
 
 
 ## 프로젝트 구조
--   **main.py**: FastAPI 애플리케이션의 메인 파일. API 라우팅 및 요청 처리를 담당합니다.
--   **whisper_pannote.py**: Whisper와 Pyannote를 사용하여 오디오 처리 및 화자 분리를 수행합니다.
--   **sllm_tool_binding.py**: Qwen LLM 에이전트를 사용하여 회의록 텍스트를 분석하고 요약/태스크를 추출하는 핵심 로직을 포함합니다.
+-   **main.py**: FastAPI 애플리케이션의 메인 파일. 비동기/동기 API 라우팅 및 요청 처리를 담당합니다.
+-   **job_manager.py**: `ThreadPoolExecutor` 기반 백그라운드 작업 큐 및 `job_id` 상태/TTL 관리를 담당합니다.
+-   **whisper_pannote.py**: Whisper와 Pyannote를 사용하여 오디오 처리(URL 다운로드 또는 원시 바이트 직접 전달) 및 화자 분리를 수행합니다.
+-   **sllm_tool_binding.py**: Qwen LLM 에이전트를 사용하여 회의록 텍스트를 분석하고 요약/태스크를 추출합니다. FAISS DB가 없는 경우 RAG 검색 단계를 생략하고 추출을 진행하는 fallback을 지원합니다.
 -   **main_model.py**: Hugging Face 모델과 토크나이저, FAISS DB를 로드하는 유틸리티 함수를 포함합니다.
+-   **mock_server.py**: GPU/모델 없이 로컬에서 Django와 폴링 동작을 검증하기 위한 경량 Mock FastAPI 서버입니다.
 -   **requirements.txt**: 프로젝트에 필요한 Python 패키지 목록입니다.
 -   **prompts/**: LLM에 전달할 프롬프트 템플릿 (시스템, 요약, 태스크 추출)을 담고 있습니다.
+
+## 주요 API 엔드포인트
+| Method | Path | 설명 |
+|---|---|---|
+| `GET` | `/health` | 서버 상태 확인 |
+| `POST` | `/stt/async` | S3/외부 URL 기반 비동기 STT + 화자 분리 시작 (`job_id` 반환) |
+| `POST` | `/stt/async-file` | 원시 오디오 바이트 기반 비동기 STT + 화자 분리 시작 (`job_id` 반환) |
+| `POST` | `/inference/async` | 비동기 SLLM 안건/요약/태스크 추출 시작 (`job_id` 반환) |
+| `GET` | `/jobs/{job_id}` | 작업 상태(`queued`/`processing`/`done`/`error`) 및 결과 조회 |
+| `POST` | `/stt`, `/inference` | 기존 동기식 엔드포인트 (하위 호환용) |
 
 
 # 1. 런팟 올리고 git clone
@@ -59,11 +71,17 @@ pip install --no-cache-dir -r requirements.txt
 echo "HF_TOKEN=<your_huggingface_token>" >> .env
   ```
 # 4. uvicorn run
+> 작업 상태(`_jobs`)를 인메모리(`JobManager`)로 관리하므로 반드시 **단일 워커(`--workers 1`, 기본값)**로 실행해야 합니다.
   ```bash
 uvicorn main:app --host 0.0.0.0 --port 8000
   ```
 
-# 4. 외부 접근 테스트
+# 4-1. (선택) 로컬 Mock 서버 실행 (GPU/모델 없이 폴링 테스트)
+  ```bash
+python mock_server.py
+  ```
+
+# 5. 외부 접근 테스트
   ```http
 https://<POD_ID>-8000.proxy.runpod.net/health
   ```

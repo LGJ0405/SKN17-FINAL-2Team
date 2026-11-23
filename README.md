@@ -58,12 +58,17 @@
 | 레이어 | 구성 요소 | 역할 |
 |---|---|---|
 | Web/App | Nginx, Django, Gunicorn, Docker, AWS EC2 | 사용자 요청 처리, 서비스 UI/인증/업무 로직 |
-| Model Serving | FastAPI, RunPod | STT/화자분리/LLM 추론 API 제공 |
+| Model Serving | FastAPI, RunPod | STT/화자분리/LLM 비동기 Job 큐 및 상태 폴링 API 제공 |
 | STT & Diarization | OpenAI Whisper, pyannoteAI | 음성→텍스트, 화자 분리 |
 | LLM | Qwen 계열 SLLM 파인튜닝 모델 | 안건/요약/태스크 구조화 추출 |
 | RAG | FAISS Vector DB | 도메인 용어/정의 기반 컨텍스트 검색 |
 | Storage/DB | AWS S3(WAV), AWS RDS(MySQL) | 파일 저장, 메타데이터/결과 저장 |
 | External | Google Calendar | 태스크 일정 연동 |
+
+### 비동기 폴링 기반 장시간 추론 처리
+1분 이상 소요되는 STT/화자 분리 및 SLLM 추론 시 Nginx/RunPod 프록시 타임아웃으로 연결이 끊어지는 문제를 방지하기 위해 **비동기 폴링 구조**로 동작합니다.
+- Django가 RunPod 모델 서버(`/stt/async`, `/stt/async-file`, `/inference/async`)에 작업을 요청하면 즉시 `job_id`를 반환받고,
+- 브라우저 대기 화면(`job_poller.js`)은 3초 간격으로 Django를 통해 `/jobs/{job_id}` 상태를 폴링하다가 완료(`done`) 시 결과를 DB에 저장하고 다음 화면으로 자동 이동합니다.
 
 ---
 ## 시퀀스 다이어그램
